@@ -1,0 +1,57 @@
+# Build the site and publish it to GitHub Pages.
+#
+# SITE_URL and BASE_PATH are DERIVED FROM THE REPOSITORY, not hardcoded: a project page is served
+# at https://<owner>.github.io/<repo>/, and both halves are already available as context here. So
+# renaming the repo, or forking it, keeps canonical URLs and asset paths correct with no edit.
+#
+# Moving to a custom domain later: add a CNAME file to public/, set SITE_URL to that domain and
+# BASE_PATH to "/", and flip NOINDEX in src/consts.ts.
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two deploys race; finish the one in flight, queue the newest.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build
+        env:
+          SITE_URL: https://${{ github.repository_owner }}.github.io
+          BASE_PATH: /${{ github.event.repository.name }}
+        run: npm run build
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

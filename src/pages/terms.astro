@@ -1,0 +1,93 @@
+---
+/**
+ * Terms — a placeholder that says it is one.
+ *
+ * NOT LEGALLY REVIEWED and not a contract. Inventing plausible-sounding terms for a product that
+ * touches customer money would be worse than publishing nothing: it reads as binding to a reader
+ * and binds nobody. This page covers the site, and points at the real agreement for the product.
+ * `index={false}` until counsel has been through it.
+ */
+import PageHero from '@/components/PageHero.astro'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { CONTACT_EMAIL } from '@/consts'
+
+const lastUpdated = 'August 2026'
+---
+
+<BaseLayout
+  title="Terms"
+  description="Terms covering this website, and where the product's actual agreement lives."
+  index={false}
+>
+  <PageHero
+    eyebrow="Terms"
+    title="Terms for this website — and where the real agreement lives."
+    lede="Verity is pre-launch and sold through a written agreement, not a click-through. Rather than publish plausible-looking terms that bind nobody, this page says what actually applies today."
+  />
+
+  <section class="section-y">
+    <div class="shell">
+      <div class="border-hairline bg-surface rounded-md mb-14 max-w-3xl border p-6">
+        <p class="mono text-exception text-xs tracking-wider uppercase">Pre-launch notice</p>
+        <p class="text-ink-muted mt-3 leading-relaxed">
+          This page is a plain-language statement, <span class="text-ink">not</span> a legal
+          agreement, and has not been reviewed by counsel. Use of the product is governed by the
+          written agreement signed with each design partner. Self-serve terms will be published here
+          when self-serve signup exists.
+        </p>
+      </div>
+
+      <div class="max-w-3xl space-y-14">
+        <div>
+          <h2 class="text-2xl font-medium">Using this website</h2>
+          <ul class="text-ink-muted mt-6 space-y-4 text-lg leading-relaxed">
+            <li>
+              The content here is provided for information. We work hard to keep it accurate — every
+              capability claim on this site is written against what the software actually does, and
+              anything not yet built is labelled as such — but it is not a warranty or a commitment
+              to any particular feature or date.
+            </li>
+            <li>
+              Roadmap statements describe present intent. Anything marked as shipping next or
+              planned may change, and being early means some of it will.
+            </li>
+            <li>
+              The text, design and diagrams on this site are ours. The product names of other
+              companies belong to them, and are used here only to describe interoperability.
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h2 class="text-2xl font-medium">Using the demo</h2>
+          <p class="text-ink-muted mt-6 text-lg leading-relaxed">
+            The demo runs on seeded, fictional data. It is a real build of the product rather than a
+            recording, so it behaves like the product — including refusing things. Do not put real
+            customer data, real bank credentials, or anything confidential into it. It is not
+            covered by an agreement and it is not a place to keep anything.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="text-2xl font-medium">Using the product</h2>
+          <p class="text-ink-muted mt-6 text-lg leading-relaxed">
+            Covered by the written agreement with your organisation, which addresses the things that
+            actually matter for software that posts entries to your books: scope of authority, data
+            handling and deletion, availability, liability, and what happens if either side wants
+            out. If you want to read that agreement before speaking to us, ask and we will send it.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="text-2xl font-medium">Contact</h2>
+          <p class="text-ink-muted mt-6 text-lg leading-relaxed">
+            <a href={`mailto:${CONTACT_EMAIL}`} class="text-accent underline underline-offset-4">
+              {CONTACT_EMAIL}
+            </a>
+          </p>
+          <p class="text-ink-subtle mono mt-8 text-xs">Last updated {lastUpdated}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

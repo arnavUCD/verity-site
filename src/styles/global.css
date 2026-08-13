@@ -1,0 +1,325 @@
+@import 'tailwindcss';
+
+/* Self-hosted, so the site makes no third-party font request — one fewer origin in the privacy
+   story /security has to tell. Two faces, one job each (ADR 0012 §3): Geist carries text;
+   JetBrains Mono carries every MACHINE ARTEFACT — invoice refs, amounts, narration, state names.
+   That assignment is semantic, not stylistic: the mono face means "this is a literal value the
+   system handled", which is the exact distinction the product sells. */
+@import '@fontsource-variable/geist';
+@import '@fontsource-variable/jetbrains-mono';
+
+/* ============================================================================
+   Verity marketing — the "Instrument" design system (ADR 0012).
+
+   The product's claim is that it acts on PROOF rather than on a good guess. The
+   page should argue that before a word is read: light, measured, hairline-ruled,
+   closer to a schematic than to a brochure. Where the AI-finance convention is
+   dark-and-glowing, this is legible-and-aligned.
+
+   Three rules that are easy to break by accident:
+
+   1. DEPTH COMES FROM HAIRLINES AND ALIGNMENT, NOT SHADOW. No neomorphism, no
+      glass, no glow. A soft shadow says "soft"; the whole argument is precision.
+   2. --confirmed AND --exception ARE STATE VOCABULARY, NOT DECORATION. They mean
+      what the product means by them — evidence cleared the floor, or it did not.
+      Never a chart colour, never a pleasing accent.
+   3. NO ANIMATION MAY GATE CONTENT (ADR 0012 §5). Nothing is `opacity: 0` in the
+      base stylesheet waiting for JS to rescue it. Reveals below are built on
+      native scroll-driven animation, which degrades to "already visible" wherever
+      it is unsupported — the failure mode is no animation, never no content.
+   ============================================================================ */
+
+@theme {
+  --color-canvas: #fafaf9;
+  --color-surface: #ffffff;
+  --color-ink: #0b0b0c;
+  --color-ink-muted: #52525b; /* 7.4:1 on canvas */
+  --color-ink-subtle: #8a8a93; /* 3.4:1 — labels and non-essential text ONLY */
+  --color-hairline: #e7e5e2;
+  --color-hairline-strong: #d6d3ce;
+
+  --color-accent: #3730ff; /* 8.9:1 on canvas */
+  --color-accent-wash: #eeedff;
+
+  /* State vocabulary. See rule 2 in the banner. */
+  --color-confirmed: #0a7f5f; /* 4.8:1 */
+  --color-confirmed-wash: #e6f4ef;
+  --color-exception: #b45309; /* 5.1:1 */
+  --color-exception-wash: #fdf1e3;
+
+  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'SF Mono', monospace;
+
+  /* Small radii. A 28px corner reads as friendly; this system is not trying to be. */
+  --radius-xs: 3px;
+  --radius-sm: 5px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+
+@layer base {
+  html {
+    /* Lenis owns smooth scrolling where it runs (ADR 0012 §4); CSS smooth scroll here would
+       fight it. Anchor offset still has to clear the sticky header. */
+    scroll-behavior: auto;
+  }
+
+  :target {
+    scroll-margin-top: 7rem;
+  }
+
+  body {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--color-accent-wash);
+    color: var(--color-accent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* Display sizes need negative tracking; Geist is drawn loose for UI use. */
+  h1,
+  h2,
+  h3 {
+    letter-spacing: -0.022em;
+  }
+}
+
+/* ============================================================================
+   The hero film's palette (ADR 0012 §10).
+
+   Six variables that every mark in the scene and every word of hero copy reads. The film
+   interpolates them from dark to light across the scroll; these are the values the page ships
+   with, so the hero is complete and legible BEFORE any script runs — dark, on act one, exactly
+   where the film would start. No flash, and no dependency on JS to make text visible.
+
+   The media query is the no-film case (too narrow to pin, or reduced motion). It resolves the
+   palette to light in CSS rather than waiting for the script, for the same reason.
+   ============================================================================ */
+
+[data-stage] {
+  --scene-bg: #0b0b0c;
+  --scene-ink: #fafaf9;
+  --scene-muted: #a8a8b0;
+  --scene-dim: #5c5c64;
+  --scene-line: #303036;
+  --scene-surface: #17171b;
+  /* Brightened for a dark ground: #3730ff on near-black is unreadable, and a state colour that
+     dims as the background darkens has stopped being a state colour. */
+  --scene-accent: #8b84ff;
+  --scene-ok: #3ddc9a;
+  --scene-warn: #f0a63e;
+
+  background: var(--scene-bg);
+}
+
+@media (max-width: 899px), (max-aspect-ratio: 8/5), (prefers-reduced-motion: reduce) {
+  [data-stage] {
+    --scene-bg: #fafaf9;
+    --scene-ink: #0b0b0c;
+    --scene-muted: #52525b;
+    --scene-dim: #8a8a93;
+    --scene-line: #e7e5e2;
+    --scene-surface: #ffffff;
+    --scene-accent: #3730ff;
+    --scene-ok: #0a7f5f;
+    --scene-warn: #b45309;
+  }
+}
+
+/* The header sits over the stage, so it follows the film's phase — it would otherwise be
+   black-on-black for the first three acts. Scoped to the same conditions under which the film
+   actually runs, so the no-film hero keeps the ordinary light header. */
+@media (min-width: 900px) and (min-aspect-ratio: 8/5) and (prefers-reduced-motion: no-preference) {
+  html[data-film-phase='dark'] [data-site-header] {
+    background: transparent;
+    backdrop-filter: none;
+    border-bottom-color: rgb(255 255 255 / 0.07);
+  }
+  html[data-film-phase='dark'] [data-site-header] [data-wordmark] {
+    color: #fafaf9;
+  }
+  html[data-film-phase='dark'] [data-site-header] [data-wordmark] span:first-child {
+    border-color: rgb(255 255 255 / 0.22);
+  }
+  html[data-film-phase='dark'] [data-site-header] [data-nav-link] {
+    color: #a8a8b0;
+  }
+  html[data-film-phase='dark'] [data-site-header] [data-nav-link]:hover,
+  html[data-film-phase='dark'] [data-site-header] [data-nav-link][aria-current='page'] {
+    color: #fafaf9;
+  }
+  html[data-film-phase='dark'] [data-site-header] [data-cta] {
+    background: #fafaf9;
+    color: #0b0b0c;
+  }
+}
+
+[data-site-header],
+[data-site-header] a {
+  transition:
+    background-color 0.35s ease,
+    border-color 0.35s ease,
+    color 0.35s ease;
+}
+
+/* ============================================================================
+   Layout primitives
+   ============================================================================ */
+
+@utility shell {
+  width: 100%;
+  max-width: 76rem;
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+/* One place to retune vertical rhythm site-wide, instead of twenty hand-picked
+   py- values that slowly stop agreeing with each other. */
+@utility section-y {
+  padding-block: clamp(4.5rem, 8.5vw, 8rem);
+}
+
+/* The system's structural mark: a full-bleed hairline that a section sits on.
+   This is what separation looks like here — not a shadow, not a card edge. */
+@utility rule-top {
+  border-top: 1px solid var(--color-hairline);
+}
+
+/* ============================================================================
+   Type roles
+   ============================================================================ */
+
+/* Every machine artefact: refs, amounts, narration, state names. See ADR 0012 §3. */
+@utility mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'zero' 1; /* slashed zero — this is a system's output, and it should look like one */
+}
+
+/* The small mono label that sits above a heading. Used sparingly: it is the
+   schematic's callout, and it stops working the moment it is everywhere. */
+@utility label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-subtle);
+}
+
+/* ============================================================================
+   State marks — the product's own vocabulary, rendered.
+   ============================================================================ */
+
+@utility chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: var(--radius-xs);
+  padding: 0.2rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+@utility chip-confirmed {
+  background: var(--color-confirmed-wash);
+  color: var(--color-confirmed);
+}
+
+@utility chip-exception {
+  background: var(--color-exception-wash);
+  color: var(--color-exception);
+}
+
+@utility chip-neutral {
+  background: color-mix(in srgb, var(--color-hairline) 45%, transparent);
+  color: var(--color-ink-muted);
+}
+
+/* ============================================================================
+   Motion.
+
+   Built on NATIVE scroll-driven animation (`animation-timeline: view()`), which
+   is why it satisfies ADR 0012 §5 for free: where the feature is unsupported the
+   declaration is simply ignored and the element renders in its final state. The
+   element is never hidden waiting to be rescued — there is no JS in this path at
+   all, so there is no tab-throttling, hydration-failure, or observer-never-fired
+   case that can strand content off-screen.
+   ============================================================================ */
+
+/* NOTE THE RANGE — both endpoints are in the SAME phase, and that is not cosmetic.
+   The first version of this utility used `entry 5% cover 22%`, mixing phases. For a short
+   element, `cover 22%` resolves EARLIER than `entry 5%`, giving an inverted range whose progress
+   pins at 0 — so the element holds its `from` keyframe forever and the content is invisible while
+   sitting in the middle of the viewport. Caught in browser: six pipeline steps, fully on screen,
+   `opacity: 0`. Exactly the failure ADR 0012 §5 exists to forbid, produced by the utility written
+   to honour it. A single-phase range is well-formed in every geometry, including elements taller
+   than the viewport and elements already on screen at load. */
+@utility reveal {
+  animation: reveal-up linear both;
+  animation-timeline: view();
+  animation-range: entry 0% entry 60%;
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* A hairline that draws itself as the section arrives — the schematic metaphor,
+   and the one flourish this system allows on structure. */
+/* Single-phase range, for the reason documented on `reveal` above. */
+@utility rule-draw {
+  transform-origin: left;
+  animation: rule-draw linear both;
+  animation-timeline: view();
+  animation-range: entry 0% entry 45%;
+}
+
+@keyframes rule-draw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Every animation on this site is decorative by decision (ADR 0012 §5), so turning
+   all of it off can never cost a visitor content. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .reveal,
+  .rule-draw {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

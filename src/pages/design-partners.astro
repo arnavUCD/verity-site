@@ -1,0 +1,215 @@
+---
+/**
+ * Design partners — being early, stated as a fact and turned into an offer.
+ *
+ * From the narrative §6.3 and §5. The "who this is not for" section is deliberate: a page that
+ * disqualifies people is more credible than one that claims everyone, and it saves both sides a
+ * call that was never going to close.
+ */
+import { url } from '@/lib/url'
+import CTASection from '@/components/CTASection.astro'
+import PageHero from '@/components/PageHero.astro'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { CONTACT_EMAIL } from '@/consts'
+
+const youGet = [
+  {
+    title: 'Direct access to the people building it',
+    body: 'Not a success manager relaying tickets. Your exception patterns shape the matcher, and the person changing the matching logic is the person you spoke to.',
+  },
+  {
+    title: 'Your accounting system moves up the roadmap',
+    body: 'The connector order is not fixed. A design partner on QuickBooks or Xero moves that adapter ahead of the queue, built against your real data rather than a sandbox.',
+  },
+  {
+    title: 'Pricing locked for the partnership period',
+    body: 'Pricing is not set yet. Partners get it fixed for the term, and will not be repriced into whatever we land on later.',
+  },
+  {
+    title: 'A say in what gets built next',
+    body: 'The roadmap has real open questions on it — how far the finance-head overview should go, whether discretionary credits keep their approval step permanently. Partners get to argue for an answer.',
+  },
+]
+
+const weAsk = [
+  {
+    title: 'Real transaction volume',
+    body: 'A live bank feed and a real billing system. A sandbox teaches us nothing about the narration patterns that actually break matching.',
+  },
+  {
+    title: 'Honest feedback, quickly',
+    body: 'Including the unflattering kind. The most valuable thing you can send us is an exception we should have handled and did not.',
+  },
+  {
+    title: 'A reference conversation, once it works',
+    body: 'Not before. We are not going to ask you to vouch for something you have not run yet, and we will not put your logo on this site until you tell us we can.',
+  },
+]
+
+const fit = [
+  'B2B, invoiced rather than card-paid, with enough payment volume that reconciliation is a weekly grind',
+  'A cloud accounting system we can read — Zoho Books today, with QuickBooks and Xero next',
+  'A bank Plaid can connect to',
+  'A finance head or controller who is personally doing work they should be able to hand off',
+  'An auditor or accountant who asks hard questions — this product is built to survive them',
+]
+
+const notFit = [
+  'Consumer or card-first businesses, where the exception profile is chargebacks rather than credit notes',
+  'Teams on TallyPrime today — the local connector is a real project and it is not built yet',
+  'Anyone who wants a general-purpose finance analytics dashboard; several of the metrics you would ask for are ones we deliberately do not compute',
+  'Anyone who wants the AI to make discretionary commercial decisions on its own',
+]
+---
+
+<BaseLayout
+  title="Design partners"
+  description="Verity is pre-launch and onboarding design partners. What that buys you, what we ask in return, and who it is not a fit for."
+>
+  <PageHero
+    eyebrow="Design partners"
+    title="We are early. Here is exactly what that means."
+    lede="Verity is pre-launch. No customer logos, no testimonials, no certifications — because none of those are real yet, and a finance buyer checks. What is real is a working pipeline and a short list of companies we can build the next stretch of it around."
+  />
+
+  {/* ------------------------------------------------------------------- the trade */}
+  <section class="section-y">
+    <div class="shell">
+      <div class="grid gap-14 lg:grid-cols-2">
+        <div>
+          <p class="label">What you get</p>
+          <h2 class="mt-4 text-[clamp(1.7rem,3vw,2.3rem)] leading-[1.15] font-medium">
+            The advantages of being first.
+          </h2>
+          <ul class="mt-10 space-y-8">
+            {
+              youGet.map((item) => (
+                <li class="border-hairline reveal border-t pt-6">
+                  <h3 class="text-lg font-medium">{item.title}</h3>
+                  <p class="text-ink-muted mt-3 leading-relaxed">{item.body}</p>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <div>
+          <p class="label">What we ask</p>
+          <h2 class="mt-4 text-[clamp(1.7rem,3vw,2.3rem)] leading-[1.15] font-medium">
+            And the costs of it.
+          </h2>
+          <ul class="mt-10 space-y-8">
+            {
+              weAsk.map((item) => (
+                <li class="border-hairline reveal border-t pt-6">
+                  <h3 class="text-lg font-medium">{item.title}</h3>
+                  <p class="text-ink-muted mt-3 leading-relaxed">{item.body}</p>
+                </li>
+              ))
+            }
+          </ul>
+          <div class="border-hairline bg-surface rounded-md mt-10 border p-6">
+            <p class="text-ink-muted leading-relaxed">
+              The honest cost of being early: you are running a young product against real money.
+              Every control described on the
+              <a href={url("/security")} class="text-accent underline underline-offset-4">security page</a>
+              exists precisely because that is true, and none of them makes the risk zero.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* ---------------------------------------------------------------------- the fit */}
+  <section class="rule-top section-y">
+    <div class="shell">
+      <p class="label">Fit</p>
+      <h2 class="mt-4 max-w-3xl text-[clamp(1.8rem,3.2vw,2.6rem)] leading-[1.1] font-medium">
+        Who this works for, and who it does not.
+      </h2>
+      <p class="text-ink-muted mt-6 max-w-2xl text-lg leading-relaxed">
+        We would rather lose ten minutes of your time on this page than an hour of it on a call that
+        was never going to work.
+      </p>
+
+      <div class="mt-14 grid gap-12 lg:grid-cols-2">
+        <div>
+          <p class="mono text-confirmed text-xs tracking-wider uppercase">A strong fit</p>
+          <ul class="mt-6 space-y-4">
+            {
+              fit.map((f) => (
+                <li class="border-hairline flex gap-4 border-b pb-4 last:border-0">
+                  <span class="text-confirmed mt-1.5 size-1.5 shrink-0 rounded-full bg-current" />
+                  <p class="leading-relaxed">{f}</p>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+        <div>
+          <p class="mono text-exception text-xs tracking-wider uppercase">Not right now</p>
+          <ul class="mt-6 space-y-4">
+            {
+              notFit.map((f) => (
+                <li class="border-hairline flex gap-4 border-b pb-4 last:border-0">
+                  <span class="text-exception mt-1.5 size-1.5 shrink-0 rounded-full bg-current" />
+                  <p class="text-ink-muted leading-relaxed">{f}</p>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* --------------------------------------------------------------------- how to start */}
+  <section class="rule-top section-y">
+    <div class="shell">
+      <div class="max-w-3xl">
+        <p class="label">How it starts</p>
+        <h2 class="mt-4 text-[clamp(1.8rem,3.2vw,2.6rem)] leading-[1.1] font-medium">
+          Three steps, and none of them is a procurement cycle.
+        </h2>
+        <ol class="mt-12 space-y-10">
+          {
+            [
+              {
+                t: 'Look at the demo',
+                b: 'It is the real product on seeded data, not a recorded walkthrough. Ten minutes tells you whether the shape is right.',
+              },
+              {
+                t: 'Send us a week of your bank narration',
+                b: 'The messier the better. We will tell you honestly how much of it clears the matching floor and how much would land in your exception queue — before you connect anything.',
+              },
+              {
+                t: 'Connect a read-only feed',
+                b: 'Bank via Plaid, billing via your provider’s consent screen. Read-only first: you can watch it classify for as long as you like before anything is ever posted back.',
+              },
+            ].map((s, i) => (
+              <li class="border-hairline flex gap-8 border-t pt-6">
+                <span class="mono text-accent text-xs">{String(i + 1).padStart(2, '0')}</span>
+                <div>
+                  <h3 class="text-xl font-medium">{s.t}</h3>
+                  <p class="text-ink-muted mt-3 max-w-xl leading-relaxed">{s.b}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+        <p class="text-ink-muted mt-12 leading-relaxed">
+          Questions before any of that:
+          <a href={`mailto:${CONTACT_EMAIL}`} class="text-accent underline underline-offset-4">
+            {CONTACT_EMAIL}
+          </a>. It reaches the people building it.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <CTASection
+    title="Start with the demo"
+    body="Then tell us what your week actually looks like. If we are not the right fit we will say so on the first call."
+  />
+</BaseLayout>

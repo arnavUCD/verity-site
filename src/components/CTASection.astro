@@ -1,0 +1,41 @@
+---
+/**
+ * The closing block, on every interior page. Two routes out and no form: the demo is the product,
+ * and a `mailto:` is the only other way in (ADR 0011 §3 — nothing here collects data, so nothing
+ * here can leak it).
+ */
+import CtaButton from '@/components/CtaButton.astro'
+import { CONTACT_EMAIL } from '@/consts'
+
+interface Props {
+  title?: string
+  body?: string
+}
+const {
+  title = 'See it running on real data',
+  body = 'The demo is the product, not a recorded walkthrough. If you would rather talk it through first, we answer our own email.',
+} = Astro.props
+---
+
+<section class="rule-top section-y">
+  <div class="shell">
+    <div class="max-w-2xl">
+      <h2 class="text-[clamp(1.8rem,3.2vw,2.6rem)] leading-[1.1] font-medium text-balance">
+        {title}
+      </h2>
+      <p class="text-ink-muted mt-5 text-lg leading-relaxed">{body}</p>
+      <div class="mt-9 flex flex-wrap items-center gap-3">
+        <CtaButton
+          class="bg-ink text-canvas rounded-sm hover:bg-accent inline-flex items-center gap-2 px-5 py-3 text-sm font-medium transition-colors duration-200"
+          arrow
+        />
+        <a
+          href={`mailto:${CONTACT_EMAIL}`}
+          class="border-hairline-strong rounded-sm hover:border-ink inline-flex px-5 py-3 text-sm transition-colors duration-200"
+        >
+          Talk to us
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,24 @@
+---
+/**
+ * The interior-page hero. One shape for every page that isn't the home film, so the site reads as
+ * one publication rather than seven microsites.
+ */
+interface Props {
+  eyebrow: string
+  title: string
+  lede: string
+}
+const { eyebrow, title, lede } = Astro.props
+---
+
+<section class="section-y pb-0">
+  <div class="shell">
+    <p class="label">{eyebrow}</p>
+    <h1
+      class="mt-5 max-w-4xl text-[clamp(2.1rem,4vw,3.4rem)] leading-[1.07] font-medium text-balance"
+    >
+      {title}
+    </h1>
+    <p class="text-ink-muted mt-7 max-w-2xl text-lg leading-relaxed">{lede}</p>
+  </div>
+</section>

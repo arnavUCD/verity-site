@@ -1,0 +1,33 @@
+---
+/**
+ * Placeholder wordmark. The mark is an equals sign in a hairline square: reconciliation is
+ * literally the act of making two records agree, and "=" is the shortest possible statement of
+ * that. It is also the one glyph that stays correct as the product's scope grows — a check mark
+ * would have encoded the approval step we are removing.
+ *
+ * TODO(brand): swap for the real mark when one exists.
+ */
+interface Props {
+  href?: string
+  class?: string
+}
+const { href, class: className = '' } = Astro.props
+const Tag = href ? 'a' : 'div'
+---
+
+<Tag
+  {...href ? { href } : {}}
+  data-wordmark
+  class={`group inline-flex items-center gap-2.5 ${className}`}
+  aria-label="Verity — home"
+>
+  <span
+    class="border-hairline-strong rounded-xs group-hover:border-accent grid size-6 place-items-center border transition-colors duration-300"
+  >
+    <svg viewBox="0 0 16 16" class="text-accent size-3.5" aria-hidden="true">
+      <rect x="3" y="6" width="10" height="1.4" rx="0.4" fill="currentColor"></rect>
+      <rect x="3" y="9.2" width="10" height="1.4" rx="0.4" fill="currentColor"></rect>
+    </svg>
+  </span>
+  <span class="text-[1.0625rem] font-medium tracking-[-0.03em]">Verity</span>
+</Tag>

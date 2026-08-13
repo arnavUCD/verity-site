@@ -1,0 +1,85 @@
+---
+/**
+ * The footer, including the site's standing disclosure.
+ *
+ * That last line is not humility copy — it is the site's operating rule (ADR 0011 §4) printed
+ * where a sceptical reader will look. A page claiming every statement traces to code should say
+ * so somewhere it can be held to.
+ */
+import Wordmark from '@/components/Wordmark.astro'
+import { APP_URL, CONTACT_EMAIL, CTA } from '@/consts'
+import { url } from '@/lib/url'
+
+const year = new Date().getFullYear()
+
+const columns = [
+  {
+    title: 'Product',
+    links: [
+      { href: '/how-it-works', label: 'How it works' },
+      { href: '/use-cases', label: 'Use cases' },
+      { href: '/integrations', label: 'Integrations' },
+      { href: CTA.available ? APP_URL : null, label: CTA.available ? 'Live demo' : 'Demo — upcoming' },
+    ],
+  },
+  {
+    title: 'Company',
+    links: [
+      { href: '/security', label: 'Security' },
+      { href: '/design-partners', label: 'Design partners' },
+      { href: `mailto:${CONTACT_EMAIL}`, label: 'Talk to us' },
+    ],
+  },
+  {
+    title: 'Legal',
+    links: [
+      { href: '/privacy', label: 'Privacy' },
+      { href: '/terms', label: 'Terms' },
+    ],
+  },
+]
+---
+
+<footer class="rule-top mt-8">
+  <div class="shell">
+    <div class="grid gap-12 py-14 md:grid-cols-[1.6fr_repeat(3,1fr)]">
+      <div>
+        <Wordmark />
+        <p class="text-ink-muted mt-4 max-w-xs text-sm leading-relaxed">
+          Agentic accounting operations. Your bank feed, reconciled and posted to your books.
+        </p>
+      </div>
+
+      {
+        columns.map((col) => (
+          <div>
+            <h2 class="label">{col.title}</h2>
+            <ul class="mt-4 space-y-2.5">
+              {col.links.map((link) => (
+                <li>
+                  {link.href ? (
+                    <a href={url(link.href)} class="text-ink-muted hover:text-ink text-sm transition-colors">
+                      {link.label}
+                    </a>
+                  ) : (
+                    <span class="text-ink-subtle text-sm">{link.label}</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+
+    <div
+      class="border-hairline text-ink-subtle flex flex-col gap-3 border-t py-8 text-xs sm:flex-row sm:items-center sm:justify-between"
+    >
+      <p>© {year} Verity. Pre-launch — onboarding design partners.</p>
+      <p class="max-w-lg sm:text-right">
+        Every claim on this site traces to code in the product. No customer logos, testimonials, or
+        compliance badges until they are real.
+      </p>
+    </div>
+  </div>
+</footer>

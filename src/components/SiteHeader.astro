@@ -1,0 +1,101 @@
+---
+/**
+ * The header: a hairline-ruled bar, not a floating pill. In this system separation comes from a
+ * rule and from alignment (ADR 0012 §2), so the header's job is to sit exactly on the grid and
+ * get out of the way.
+ *
+ * The mobile menu is a native <details> disclosure, not an island — the nav is the one component
+ * that MUST work before any script does, and a hydration failure that strands a visitor with no
+ * way to navigate is worse than any polish it would buy.
+ */
+import CtaButton from '@/components/CtaButton.astro'
+import Wordmark from '@/components/Wordmark.astro'
+import { NAV } from '@/consts'
+import { url } from '@/lib/url'
+
+const path = Astro.url.pathname
+/** Section-level match, so /use-cases/duplicate-payment still lights up "Use cases". Compared
+ *  against the BASE-PREFIXED href, since `Astro.url.pathname` carries the base too. */
+const isActive = (href: string) => {
+  const to = url(href)
+  return path === to || path === `${to}/` || path.startsWith(`${to}/`)
+}
+---
+
+<header
+  data-site-header
+  class="border-hairline bg-canvas/85 sticky top-0 z-40 border-b backdrop-blur-md supports-[backdrop-filter]:bg-canvas/70"
+>
+  <div class="shell">
+    <div class="flex h-16 items-center justify-between gap-6">
+      <Wordmark href={url("/")} />
+
+      <nav class="hidden items-center gap-7 md:flex" aria-label="Primary">
+        {
+          NAV.map((item) => (
+            <a
+              href={url(item.href)}
+              data-nav-link
+              aria-current={isActive(item.href) ? 'page' : undefined}
+              class:list={[
+                'relative py-1 text-sm transition-colors duration-200',
+                isActive(item.href) ? 'text-ink' : 'text-ink-muted hover:text-ink',
+              ]}
+            >
+              {item.label}
+              {isActive(item.href) && (
+                <span class="bg-accent absolute -bottom-[1.35rem] left-0 h-px w-full" />
+              )}
+            </a>
+          ))
+        }
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <CtaButton
+          class="bg-ink text-canvas rounded-sm hover:bg-accent hidden px-4 py-2 text-sm font-medium transition-colors duration-200 sm:inline-flex"
+        />
+
+        <details class="group relative md:hidden">
+          <summary
+            class="border-hairline-strong rounded-sm grid size-9 cursor-pointer place-items-center border [&::-webkit-details-marker]:hidden"
+            aria-label="Menu"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              class="size-4.5"
+              aria-hidden="true"
+            >
+              <path d="M4 8h16M4 16h16"></path>
+            </svg>
+          </summary>
+
+          <nav
+            class="border-hairline bg-surface rounded-md absolute right-0 mt-3 flex w-60 flex-col border p-2 shadow-[0_12px_40px_-12px_rgba(11,11,12,0.18)]"
+            aria-label="Primary, mobile"
+          >
+            {
+              NAV.map((item) => (
+                <a
+                  href={url(item.href)}
+                  aria-current={isActive(item.href) ? 'page' : undefined}
+                  class:list={[
+                    'rounded-xs px-3 py-2.5 text-sm',
+                    isActive(item.href) ? 'text-ink bg-accent-wash' : 'text-ink-muted',
+                  ]}
+                >
+                  {item.label}
+                </a>
+              ))
+            }
+            <CtaButton class="bg-ink text-canvas rounded-xs mt-1 block px-3 py-2.5 text-sm font-medium" />
+          </nav>
+        </details>
+      </div>
+    </div>
+  </div>
+</header>

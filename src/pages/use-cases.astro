@@ -1,0 +1,200 @@
+---
+/**
+ * Use cases — the eight scenarios from docs/marketing/product-narrative.md Part 4, in the
+ * document's own situation → without → with structure.
+ *
+ * The "without" column is doing the selling. A finance reader recognises their own week in it, and
+ * a claim they recognise is worth more than one they have to take on faith.
+ */
+import CTASection from '@/components/CTASection.astro'
+import PageHero from '@/components/PageHero.astro'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+interface Case {
+  id: string
+  title: string
+  who: string
+  tone: 'confirmed' | 'exception' | 'neutral'
+  situation: string
+  without: string
+  with: string
+}
+
+const cases: Case[] = [
+  {
+    id: 'UC-1',
+    title: 'The duplicate payment nobody catches',
+    who: 'Finance head',
+    tone: 'confirmed',
+    situation:
+      'A customer pays INV-1042 by ACH. Three weeks later their AP system pays it again from a re-approved copy of the same invoice.',
+    without:
+      'The second payment sits unapplied, or gets applied to the wrong invoice. The customer is out the money until they reconcile their own books and complain — often a quarter later, by which point it is a relationship problem rather than an accounting one.',
+    with: 'Verity matches the second payment to an invoice it already holds a confirmed settlement for, classifies it as a duplicate, raises a credit note for the full amount, and posts it. It appears in the day’s report as done.',
+  },
+  {
+    id: 'UC-2',
+    title: 'The overpayment that becomes a credit balance',
+    who: 'Finance head',
+    tone: 'confirmed',
+    situation: 'An invoice for $48,500 is paid as $50,000 — rounded up, or an old rate applied.',
+    without:
+      'Someone notices the mismatch, decides it is close enough, and applies the whole amount. The extra $1,500 is now wrong in two places, and nobody has written down why.',
+    with: 'Classified as an overpayment, credited for the excess, posted, reported. The customer’s balance is right without anyone having to notice.',
+  },
+  {
+    id: 'UC-3',
+    title: 'The reference that looks right and isn’t',
+    who: 'Finance head',
+    tone: 'exception',
+    situation:
+      'Narration reads PAYMENT INV-1042 REF INV-1043. Two plausible invoices, one payment.',
+    without:
+      'A rules engine picks the first match and posts against the wrong customer account. Nobody finds it until a statement goes out.',
+    with: 'Two candidates means the floor is not cleared. It becomes an exception carrying both candidates and the model’s reading of the narration. A person spends thirty seconds on the one item that actually needed a person.',
+  },
+  {
+    id: 'UC-4',
+    title: 'The clean payment',
+    who: 'Finance head',
+    tone: 'confirmed',
+    situation:
+      'Most transactions. The reference is attribution-grade, the amount matches, the invoice is open.',
+    without:
+      'It still has to be matched by hand, because you cannot tell it is clean until you have checked it.',
+    with: 'Reconciled automatically. No credit note, no queue entry, no attention. This is the volume case, and it is what makes the exception list short enough to actually work.',
+  },
+  {
+    id: 'UC-5',
+    title: 'The goodwill credit',
+    who: 'CX / support',
+    tone: 'neutral',
+    situation: 'A support agent agrees to credit a customer for a service failure.',
+    without:
+      'An email to the billing team, a spreadsheet, and no consistent record of who agreed to what or why.',
+    with: 'The agent types the request in plain language. Verity extracts the invoice, amount and reason, fetches the invoice, checks policy — is the amount within the invoice total, is the invoice still creditable, was a reason given — and drafts the credit note with its reasoning attached. This one keeps a human decision by design: it is a commercial judgement, not a fact about a payment.',
+  },
+  {
+    id: 'UC-6',
+    title: 'The end-of-day close',
+    who: 'Finance head',
+    tone: 'confirmed',
+    situation: '5:30pm. The finance head opens Verity.',
+    without: 'They open the bank statement and start working.',
+    with: 'They read what was done — every automated decision with its basis — and work a short exception list. The two lists cannot overlap: an item is either settled or waiting, never presented as both.',
+  },
+  {
+    id: 'UC-7',
+    title: 'The audit question, six months later',
+    who: 'Controller / auditor',
+    tone: 'confirmed',
+    situation: '“Who approved this credit?”',
+    without: 'An email thread, if it still exists.',
+    with: 'The trail shows the decision, the actor, and what kind of actor it was — a person, the automated pipeline, or a worker executing a decision someone already made. Automation is never rendered as a human approval, so “the system did this automatically” is a defensible answer rather than an embarrassing discovery.',
+  },
+  {
+    id: 'UC-8',
+    title: 'The feed that quietly stopped',
+    who: 'Finance head',
+    tone: 'exception',
+    situation: 'A bank connection expires. Transactions stop arriving.',
+    without:
+      'Nothing looks wrong. Empty queues look like a quiet week. It surfaces at close, when it is expensive.',
+    with: 'Verity detects the configured-but-not-processing state and raises it. The absence of work is itself monitored — which is the hardest class of failure for a person to notice.',
+  },
+]
+---
+
+<BaseLayout
+  title="Use cases"
+  description="Eight situations from a real finance week — duplicate payments, overpayments, ambiguous references, goodwill credits, the close, and the audit question — with and without Verity."
+>
+  <PageHero
+    eyebrow="Use cases"
+    title="Eight situations from an ordinary finance week."
+    lede="None of these are hard problems. All of them need context, and all of them cost more the longer they sit. Each is written as it actually happens: the situation, what today looks like, and what changes."
+  />
+
+  <section class="section-y">
+    <div class="shell">
+      <ul class="space-y-px">
+        {
+          cases.map((c) => (
+            <li class="border-hairline reveal border-t py-12">
+              <div class="grid gap-8 lg:grid-cols-[minmax(0,20rem)_1fr] lg:gap-14">
+                <div>
+                  <div class="flex items-center gap-3">
+                    <span class="mono text-ink-subtle text-xs">{c.id}</span>
+                    <span
+                      class:list={[
+                        'chip',
+                        c.tone === 'confirmed'
+                          ? 'chip-confirmed'
+                          : c.tone === 'exception'
+                            ? 'chip-exception'
+                            : 'chip-neutral',
+                      ]}
+                    >
+                      {c.who}
+                    </span>
+                  </div>
+                  <h2 class="mt-4 text-2xl leading-snug font-medium text-balance">{c.title}</h2>
+                  <p class="text-ink-muted mt-4 leading-relaxed">{c.situation}</p>
+                </div>
+
+                <div class="grid gap-8 sm:grid-cols-2">
+                  <div>
+                    <p class="mono text-ink-subtle text-xs tracking-wider uppercase">Today</p>
+                    <p class="text-ink-muted mt-3 leading-relaxed">{c.without}</p>
+                  </div>
+                  <div class="border-hairline bg-surface rounded-md border p-6">
+                    <p class="mono text-confirmed text-xs tracking-wider uppercase">With Verity</p>
+                    <p class="mt-3 leading-relaxed">{c.with}</p>
+                  </div>
+                </div>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  {/* --------------------------------------------------------- measure it yourself */}
+  <section class="rule-top section-y">
+    <div class="shell">
+      <div class="grid gap-12 lg:grid-cols-[1fr_1fr]">
+        <div>
+          <p class="label">The business case</p>
+          <h2 class="mt-4 text-[clamp(1.8rem,3.2vw,2.6rem)] leading-[1.1] font-medium">
+            Four numbers we would rather you calculated than read.
+          </h2>
+          <p class="text-ink-muted mt-6 text-lg leading-relaxed">
+            We publish no benchmark figures, because we have none that are ours. These come out of
+            your own system, and a number you computed is worth more than a statistic we printed.
+          </p>
+        </div>
+        <ol class="space-y-6">
+          {
+            [
+              'How many payments in the last 12 months were a second payment against an already-settled invoice — and what were they worth?',
+              'How much is sitting in unapplied or suspense right now, and how old is the oldest item?',
+              'How many person-hours a week go into matching payments, and at what seniority?',
+              'How many days of the monthly close go to payment reconciliation and the corrections that fall out of it?',
+            ].map((q, i) => (
+              <li class="border-hairline flex gap-5 border-b pb-6 last:border-0">
+                <span class="mono text-accent text-xs">{String(i + 1).padStart(2, '0')}</span>
+                <p class="leading-relaxed">{q}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <CTASection
+    title="Bring us the messiest week you have"
+    body="The useful demo is not the clean one. If your narration is truncated, your references are missing and half the payments are part-payments, that is the interesting conversation."
+  />
+</BaseLayout>

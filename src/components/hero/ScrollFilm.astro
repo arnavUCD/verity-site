@@ -1,0 +1,671 @@
+---
+/**
+ * The hero: a full-bleed, scroll-scrubbed film of the entire pipeline.
+ *
+ * The camera travels a scene four times wider than the viewport — feed → ingest → match →
+ * classify → post → report — while the palette resolves from near-black to the page's own canvas,
+ * so the film hands off into the light content below with no seam. Scroll IS the transport: the
+ * payment moves because you moved.
+ *
+ * WHY IT IS BUILT THIS WAY, in order of what would break first if ignored:
+ *
+ * 1. THE TALL SCROLL HEIGHT IS SET BY JS, NEVER BY CSS. Without the script the section is exactly
+ *    one viewport tall and shows act one — a complete, readable hero. Had the 460vh lived in the
+ *    stylesheet, a failed script would leave four blank screens to scroll past, which is the
+ *    ADR 0012 §5 failure in its most expensive form.
+ * 2. COLOUR IS SIX CSS VARIABLES, INTERPOLATED IN ONE onUpdate. Every mark and every word of copy
+ *    reads from them, so the dark→light resolve is one lerp rather than sixty tweens that can
+ *    disagree about what phase they are in. It also means the copy stays legible at every point
+ *    on the scroll, which is the thing a dark-to-light hero usually gets wrong.
+ * 3. THE HEADER FOLLOWS THE FILM. `data-film-phase` on <html> flips the sticky header to its
+ *    inverted treatment while the stage is dark; the header would otherwise be black-on-black.
+ * 4. NO PINNING BELOW 900px OR UNDER REDUCED MOTION. Both fall back to the same static hero as
+ *    the no-JS case, rather than to a degraded version of the film.
+ */
+import { url } from '@/lib/url'
+import CtaButton from '@/components/CtaButton.astro'
+
+/**
+ * Act one's feed, drawn as a bank statement rather than a list of strings — the design is doing
+ * work here, not decorating: a statement is the artefact the reader currently reconciles by hand,
+ * so it is what they recognise.
+ *
+ * Two rows are ACME at $48,500.00. That repetition is the product in one glance — the duplicate is
+ * already sitting in the raw feed, and finding it is the tedious part.
+ *
+ * `tick` marks the rows that become payments on the rail, so the eye can follow one item from
+ * statement line to posted credit.
+ */
+const FEED = [
+  { desc: 'ACH CREDIT ACME ENTERPRISES INV1051', amt: '$12,000.00', tick: true },
+  { desc: 'WIRE IN NORTHWIND TRADING INV-1042', amt: '$48,500.00', tick: true },
+  { desc: 'CHECK DEPOSIT 8842 NO MEMO', amt: '$9,150.00', tick: true },
+  { desc: 'ACH CREDIT SUMMIT LOGISTICS 1067', amt: '$3,275.00', tick: false },
+  { desc: 'WIRE FEDWIRE CEDAR & SONS INV1074', amt: '$6,400.00', tick: true },
+  { desc: 'ACH CREDIT ACME ENT INV1042 DUP?', amt: '$48,500.00', tick: false },
+  { desc: 'ZELLE PAYMENT 9920 NO REF', amt: '$2,100.00', tick: false },
+  { desc: 'ACH CREDIT VERTEX SUPPLY INV-1088', amt: '$18,900.00', tick: false },
+  { desc: 'WIRE IN ORION PARTS INV1043 SETTLE', amt: '$7,420.00', tick: false },
+]
+
+/** Stations, in scene coordinates. The camera pans past them in order. */
+const STATIONS = [
+  { x: 1780, label: 'Ingest', caption: 'Read once, never twice' },
+  { x: 2280, label: 'Match', caption: 'Matched only on proof' },
+  { x: 2800, label: 'Classify', caption: 'Duplicate, overpayment, or clean' },
+  { x: 3300, label: 'Post', caption: 'Posted back to your books' },
+]
+
+/** The ledger — invoice rows in the customer's books. */
+const ROWS = [
+  { y: 210, ref: 'INV-1042' },
+  { y: 268, ref: 'INV-1043' },
+  { y: 326, ref: 'INV-1051' },
+  { y: 384, ref: 'INV-1067' },
+  { y: 442, ref: 'INV-1074' },
+]
+
+/** Payments on the rail. `row` is the ledger row it attributes to; null is the exception. */
+const CHIPS = [
+  { id: 'a', ref: 'INV-1042', amt: '$48,500.00', tag: 'duplicate', row: 0, x: 1940 },
+  { id: 'b', ref: 'INV-1051', amt: '$12,000.00', tag: 'normal_payment', row: 2, x: 1640 },
+  { id: 'c', ref: 'CHECK 8842', amt: '$9,150.00', tag: 'unmatchable', row: null, x: 1340 },
+  { id: 'd', ref: 'INV-1074', amt: '$6,400.00', tag: 'overpayment', row: 4, x: 1040 },
+]
+
+const RAIL_Y = 620
+const LEDGER_X = 3560
+const ROW_W = 320
+---
+
+{/* -mt-16 pulls the stage up UNDER the sticky header, so the film is genuinely full-bleed and the
+    header floats on it (transparent while the phase is dark). The copy adds the height back as
+    padding so it never sits beneath the nav. */}
+<section data-film class="relative -mt-16">
+  <div data-stage class="relative flex h-svh flex-col overflow-hidden">
+    {/* preserveAspectRatio is xMIN, not xMid: the scene is nearly three viewports wide and the
+        camera pans it, so it must be anchored to its LEFT edge. Centring it starts the film
+        looking at the MIDDLE of the pipeline — stations on screen before the feed they process,
+        and the narration wall off past the left edge where nobody ever sees it. */}
+    <svg
+      data-scene
+      viewBox="0 0 4200 900"
+      preserveAspectRatio="xMinYMid slice"
+      fill="none"
+      class="absolute inset-0 h-full w-full"
+      aria-hidden="true"
+    >
+      <defs>
+        <linearGradient id="film-beam" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="var(--scene-accent)" stop-opacity="0"></stop>
+          <stop offset="50%" stop-color="var(--scene-accent)" stop-opacity="0.55"></stop>
+          <stop offset="100%" stop-color="var(--scene-accent)" stop-opacity="0"></stop>
+        </linearGradient>
+        <linearGradient id="feed-fade-g" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#fff" stop-opacity="1"></stop>
+          <stop offset="58%" stop-color="#fff" stop-opacity="1"></stop>
+          <stop offset="100%" stop-color="#fff" stop-opacity="0"></stop>
+        </linearGradient>
+        <mask id="feed-fade">
+          <rect x="920" y="120" width="560" height="480" fill="url(#feed-fade-g)"></rect>
+        </mask>
+      </defs>
+
+      <g data-camera>
+        {/* ------------------------------------------------- act 1 · the raw feed */}
+        {/* Unboxed text, weighted: the four lines that become payments carry full-strength ink and
+            the rest sit back, with the amount column right-aligned on a tabular face so the figures
+            line up the way they do on a real statement. Masked at the foot so the feed dissolves
+            rather than stopping at an edge — a feed continues past the frame; a list ends. */}
+        <g data-act="feed" mask="url(#feed-fade)">
+          <text x="960" y="152" class="mono" font-size="14" letter-spacing="3" fill="var(--scene-dim)">
+            RAW BANK FEED
+          </text>
+          <circle cx="1124" cy="147" r="4" fill="var(--scene-accent)" opacity="0.85"></circle>
+
+          {
+            FEED.map((line, i) => {
+              const y = 208 + i * 41
+              return (
+                <g data-narr={i} opacity={line.tick ? 1 : 0.45}>
+                  <text
+                    x="960"
+                    y={y}
+                    class="mono"
+                    font-size="14.5"
+                    fill={line.tick ? 'var(--scene-muted)' : 'var(--scene-dim)'}
+                  >
+                    {line.desc}
+                  </text>
+                  <text
+                    x="1404"
+                    y={y}
+                    class="mono"
+                    font-size="14.5"
+                    text-anchor="end"
+                    fill={line.tick ? 'var(--scene-ink)' : 'var(--scene-dim)'}
+                  >
+                    {line.amt}
+                  </text>
+                </g>
+              )
+            })
+          }
+        </g>
+
+        {/* ------------------------------------------------------------- the rail */}
+        <rect
+          x="1000"
+          y={RAIL_Y}
+          width="2850"
+          height="2"
+          fill="var(--scene-line)"
+          data-rail></rect>
+
+        {
+          STATIONS.map((s, i) => (
+            <g data-station={i}>
+              <rect x={s.x - 1} y={RAIL_Y - 26} width="2" height="52" fill="var(--scene-line)" />
+              <text
+                x={s.x}
+                y={RAIL_Y + 78}
+                class="mono"
+                font-size="18"
+                letter-spacing="3"
+                text-anchor="middle"
+                fill="var(--scene-dim)"
+                data-station-label={i}
+              >
+                {s.label.toUpperCase()}
+              </text>
+            </g>
+          ))
+        }
+
+        {/* One line above each station — what this part of the pipeline is doing, in the fewest
+            words that still say something specific. Set in the text face, not the mono one: this
+            is the film talking to the reader, not a value the system produced. */}
+        {
+          STATIONS.map((st, i) => (
+            <text
+              x={st.x}
+              y="372"
+              font-size="40"
+              font-weight="500"
+              letter-spacing="-0.8"
+              text-anchor="middle"
+              fill="var(--scene-ink)"
+              opacity="0"
+              data-stage-caption={i}
+            >
+              {st.caption}
+            </text>
+          ))
+        }
+
+        {/* The evidence sweep at MATCH. */}
+        <rect
+          x={STATIONS[1]!.x - 90}
+          y={RAIL_Y - 190}
+          width="180"
+          height="380"
+          fill="url(#film-beam)"
+          opacity="0"
+          data-beam></rect>
+
+        {/* ------------------------------------------------- act 4 · your books */}
+        <g data-act="books">
+          <text
+            x={LEDGER_X}
+            y="150"
+            class="mono"
+            font-size="17"
+            letter-spacing="3"
+            fill="var(--scene-dim)"
+          >
+            YOUR BOOKS
+          </text>
+          {
+            ROWS.map((row, i) => (
+              <g>
+                <text
+                  x={LEDGER_X}
+                  y={row.y - 14}
+                  class="mono"
+                  font-size="16"
+                  fill="var(--scene-dim)"
+                  data-row-label={i}
+                >
+                  {row.ref}
+                </text>
+                <rect x={LEDGER_X} y={row.y} width={ROW_W} height="2" fill="var(--scene-line)" />
+                <rect
+                  x={LEDGER_X}
+                  y={row.y}
+                  width="0"
+                  height="2"
+                  fill="var(--scene-ok)"
+                  data-row-fill={i}
+                />
+              </g>
+            ))
+          }
+
+          {/* The exception tray. */}
+          <rect
+            x={LEDGER_X}
+            y="700"
+            width={ROW_W}
+            height="96"
+            rx="8"
+            stroke="var(--scene-warn)"
+            stroke-width="1.5"
+            stroke-dasharray="5 5"
+            opacity="0.55"></rect>
+          <text
+            x={LEDGER_X + 20}
+            y="740"
+            class="mono"
+            font-size="15"
+            letter-spacing="2"
+            fill="var(--scene-warn)"
+          >
+            NEEDS YOU
+          </text>
+          <text
+            x={LEDGER_X + 20}
+            y="770"
+            class="mono"
+            font-size="15"
+            fill="var(--scene-warn)"
+            opacity="0"
+            data-tray-item
+          >
+            CHECK 8842 · two candidates
+          </text>
+        </g>
+
+        {/* ---------------------------------------------------- connectors */}
+        {/* MATCH to the invoice row a payment was attributed to. The exception draws TWO, then
+            retracts both — ambiguity escalates, it is never resolved by picking one. */}
+        {
+          [
+            { id: 'a', row: 0, tone: 'accent' },
+            { id: 'b', row: 2, tone: 'accent' },
+            { id: 'd', row: 4, tone: 'accent' },
+            { id: 'c1', row: 1, tone: 'warn' },
+            { id: 'c2', row: 3, tone: 'warn' },
+          ].map((c) => (
+            <path
+              d={`M ${STATIONS[1]!.x} ${RAIL_Y} C ${STATIONS[1]!.x + 700} ${RAIL_Y}, ${LEDGER_X - 640} ${ROWS[c.row]!.y}, ${LEDGER_X} ${ROWS[c.row]!.y}`}
+              stroke={c.tone === 'warn' ? 'var(--scene-warn)' : 'var(--scene-accent)'}
+              stroke-width="1.5"
+              pathLength="1"
+              stroke-dasharray="1"
+              stroke-dashoffset="1"
+              opacity="0.5"
+              data-conn={c.id}
+            />
+          ))
+        }
+
+        {/* -------------------------------------------------------------- chips */}
+        {
+          CHIPS.map((chip) => (
+            <g transform={`translate(${chip.x} ${RAIL_Y - 27})`} data-chip={chip.id} opacity="0">
+              <g opacity="0" data-tag={chip.id}>
+                <rect
+                  x="0"
+                  y="-44"
+                  width="176"
+                  height="30"
+                  rx="5"
+                  fill={chip.row === null ? 'var(--scene-warn)' : 'var(--scene-ok)'}
+                  opacity="0.16"
+                />
+                <text
+                  x="14"
+                  y="-23"
+                  class="mono"
+                  font-size="16"
+                  fill={chip.row === null ? 'var(--scene-warn)' : 'var(--scene-ok)'}
+                >
+                  {chip.tag}
+                </text>
+              </g>
+              <rect
+                x="0"
+                y="0"
+                width="232"
+                height="54"
+                rx="7"
+                fill="var(--scene-surface)"
+                stroke="var(--scene-line)"
+                stroke-width="1.5"
+              />
+              <rect x="0" y="0" width="4" height="54" rx="2" fill="var(--scene-accent)" data-chip-edge={chip.id} />
+              <text x="22" y="34" class="mono" font-size="19" fill="var(--scene-ink)">
+                {chip.ref}
+              </text>
+              <text x="244" y="34" class="mono" font-size="17" text-anchor="end" fill="var(--scene-dim)">
+                {chip.amt}
+              </text>
+            </g>
+          ))
+        }
+      </g>
+    </svg>
+
+    {/* ------------------------------------------------------------------ copy */}
+    <div class="relative z-10 flex flex-1 items-center pt-16">
+      <div class="shell w-full">
+        <div data-copy class="max-w-2xl">
+          <p class="mono text-[0.68rem] tracking-[0.18em] uppercase" style="color: var(--scene-dim)">
+            Agentic accounting operations
+          </p>
+          <h1
+            class="mt-6 text-[clamp(2.3rem,4.6vw,4rem)] leading-[1.05] font-medium text-balance"
+            style="color: var(--scene-ink)"
+          >
+            Your bank feed, reconciled and posted — while you’re doing something else.
+          </h1>
+          <p
+            class="mt-7 max-w-xl text-lg leading-relaxed"
+            style="color: var(--scene-muted)"
+          >
+            Verity connects your bank and your billing system, works out what each payment actually
+            was, credits what’s owed, and posts it back. Your finance head reads a summary at the end
+            of the day instead of doing the work during it.
+          </p>
+          <div class="mt-9 flex flex-wrap items-center gap-3">
+            <CtaButton
+              class="rounded-sm inline-flex items-center gap-2 px-5 py-3.5 text-base font-medium"
+              style="background: var(--scene-ink); color: var(--scene-bg)"
+              arrow
+            />
+            <a
+              href={url("/how-it-works")}
+              class="rounded-sm inline-flex border px-5 py-3 text-sm transition-colors"
+              style="border-color: var(--scene-line); color: var(--scene-muted)"
+            >
+              How it works
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+  import gsap from 'gsap'
+  import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+  gsap.registerPlugin(ScrollTrigger)
+
+  const section = document.querySelector<HTMLElement>('[data-film]')
+  const stage = document.querySelector<HTMLElement>('[data-stage]')
+  const scene = document.querySelector<SVGSVGElement>('[data-scene]')
+  const camera = document.querySelector<SVGGElement>('[data-camera]')
+
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)')
+  const wideEnough = window.matchMedia('(min-width: 900px) and (min-aspect-ratio: 8/5)')
+
+  /**
+   * The two palettes. Every mark in the scene and every word of hero copy reads these six
+   * variables, so the whole resolve is one interpolation — see the header comment, point 2.
+   * The dark values are brightened, not just inverted: #3730ff on near-black is unreadable, and
+   * a state colour that dims as the background darkens stops being a state colour.
+   */
+  const DARK = {
+    '--scene-bg': [11, 11, 12],
+    '--scene-ink': [250, 250, 249],
+    '--scene-muted': [168, 168, 176],
+    '--scene-dim': [92, 92, 100],
+    '--scene-line': [48, 48, 54],
+    '--scene-surface': [23, 23, 27],
+    '--scene-accent': [139, 132, 255],
+    '--scene-ok': [61, 220, 154],
+    '--scene-warn': [240, 166, 62],
+  }
+  /**
+   * The midpoint. Interpolating near-black straight to paper passes through flat neutral grey,
+   * which looks like a fade rather than a dawn. Routing through a cool slate keeps a hue in the
+   * middle of the transition, so the resolve reads as light arriving rather than as opacity.
+   */
+  const MID = {
+    '--scene-bg': [39, 42, 50],
+    '--scene-ink': [236, 238, 242],
+    '--scene-muted': [178, 182, 191],
+    '--scene-dim': [122, 127, 138],
+    '--scene-line': [68, 73, 84],
+    '--scene-surface': [48, 52, 62],
+    '--scene-accent': [122, 116, 255],
+    '--scene-ok': [45, 195, 137],
+    '--scene-warn': [224, 154, 68],
+  }
+  const LIGHT = {
+    '--scene-bg': [250, 250, 249],
+    '--scene-ink': [11, 11, 12],
+    '--scene-muted': [82, 82, 91],
+    '--scene-dim': [138, 138, 147],
+    '--scene-line': [231, 229, 226],
+    '--scene-surface': [255, 255, 255],
+    '--scene-accent': [55, 48, 255],
+    '--scene-ok': [10, 127, 95],
+    '--scene-warn': [180, 83, 9],
+  }
+
+  const paint = (t: number, el: HTMLElement) => {
+    // Two segments through MID, rather than one straight lerp — see the note on MID above.
+    const first = t < 0.5
+    const from = first ? DARK : MID
+    const to = first ? MID : LIGHT
+    const k = first ? t * 2 : (t - 0.5) * 2
+    for (const key of Object.keys(DARK) as (keyof typeof DARK)[]) {
+      const a = from[key]
+      const b = to[key]
+      const c = [0, 1, 2].map((i) => Math.round(a[i]! + (b[i]! - a[i]!) * k))
+      el.style.setProperty(key, `rgb(${c[0]} ${c[1]} ${c[2]})`)
+    }
+  }
+
+  /**
+   * THE GATE IS RE-EVALUATED, NOT DECIDED ONCE AT LOAD.
+   *
+   * Both conditions can change during a visit: a window dragged wider or maximised, a tablet
+   * rotated, or reduced-motion toggled in the OS. Reading `matchMedia` once meant a reader who
+   * loaded in a narrow window and then maximised was left with the static hero for the rest of
+   * the session, with no way to discover the film but a reload. Both transitions are handled.
+   */
+  const haveElements = Boolean(section && stage && scene && camera)
+  let film: gsap.core.Timeline | null = null
+
+  /** Act one, in full light, as an ordinary hero — the no-JS, too-narrow and reduced-motion case. */
+  const showStatic = () => {
+    if (!haveElements) return
+    paint(1, stage!)
+    stage!.style.height = 'auto'
+    stage!.classList.remove('sticky', 'top-0')
+    stage!.classList.add('py-24')
+    section!.style.height = ''
+    document.documentElement.dataset.filmPhase = 'light'
+    gsap.set(camera, { x: 0 })
+    gsap.set('[data-copy]', { clearProps: 'all' })
+    gsap.set('[data-chip]', { opacity: 1, x: 0, y: 0, scale: 1 })
+    gsap.set('[data-narr]', { clearProps: 'opacity' })
+    gsap.set('[data-stage-caption]', { opacity: 0 })
+    gsap.set('[data-conn]', { attr: { 'stroke-dashoffset': 1 } })
+    gsap.set('[data-row-fill]', { attr: { width: 0 } })
+    gsap.set(['[data-tag]', '[data-tray-item]', '[data-beam]'], { opacity: 0 })
+  }
+
+  /** Tears the film down if one is running. Restoring the static hero is `showStatic`'s job, so
+   *  that the "never started" and "was running" paths converge on exactly the same end state. */
+  const stopFilm = () => {
+    if (!film) return
+    film.scrollTrigger?.kill()
+    film.kill()
+    film = null
+  }
+
+  const startFilm = () => {
+    if (film || !haveElements) return
+    stage!.classList.remove('py-24')
+    paint(0, stage!)
+    document.documentElement.dataset.filmPhase = 'dark'
+    // The tall scroll height is applied HERE, never in CSS — see the header comment, point 1.
+    section!.style.height = '460vh'
+    stage!.classList.add('sticky', 'top-0')
+    stage!.style.height = '100svh'
+
+    const copy = document.querySelector<HTMLElement>('[data-copy]')
+    const q = <T extends Element>(sel: string) => scene!.querySelector<T>(sel)
+
+    /** How far the camera may travel: scene width minus whatever the viewport actually shows. */
+    const panEnd = () => {
+      const shown = 900 * (stage!.clientWidth / stage!.clientHeight)
+      return Math.min(0, -(4200 - shown))
+    }
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: section!,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 0.8,
+        // panEnd() is a function value, so it must be re-evaluated on refresh — otherwise a
+        // resize (or a rotated tablet) keeps panning to the old viewport's distance and either
+        // overshoots past the scene's edge or stops short of the ledger.
+        invalidateOnRefresh: true,
+        onUpdate: ({ progress }) => {
+          // The light arrives WITH THE POSTING, not before it. The film's whole argument is that
+          // work gets resolved, so the ground should turn as the resolution happens: the POST
+          // beats run at timeline 8.95–9.6 of 10, i.e. progress ~0.89–0.96, and this window is
+          // aimed at exactly that. Everything up to CLASSIFY stays in the dark it started in.
+          //
+          // LINEAR, deliberately. An ease-in-out accelerates through the middle, and sRGB
+          // interpolation already rushes there on its own — together they produced a visible
+          // lurch from near-black to near-white inside a single band of scroll. Linear tracks
+          // the scrollbar evenly, which is what makes the resolve read as light arriving rather
+          // than as a cut. The slate midpoint (MID) keeps the middle from being mud.
+          const t = gsap.utils.clamp(0, 1, (progress - 0.74) / 0.24)
+          paint(t, stage!)
+          // Flipped where the ground actually crosses into light, not at the tween's midpoint —
+          // the header is unreadable in either treatment over a half-lit slate.
+          document.documentElement.dataset.filmPhase = t > 0.7 ? 'light' : 'dark'
+        },
+      },
+    })
+
+    // The camera. Everything else is timed against this pan, so a beat always fires while its
+    // station is actually on screen.
+    tl.to(camera, { x: panEnd, ease: 'none', duration: 10 }, 0)
+
+    /**
+     * THE BEATS ARE TIMED AGAINST THE CAMERA, NOT PICKED BY FEEL.
+     *
+     * The pan is linear over 10 units across `panEnd` (~2760 scene units), so a station sits in
+     * the middle of frame at `(stationX - 720) / 2760 * 10`. The first cut of this timeline was
+     * tuned by eye and fired the match beam at t=2.6 — when the camera was still showing
+     * 718–2158 and MATCH (x=2280) had not yet come on screen. The beat played to nobody. Every
+     * beat below is anchored to the moment its subject is actually visible.
+     *
+     *   INGEST 1780 → 3.84    MATCH 2280 → 5.65    CLASSIFY 2800 → 7.54    POST 3300 → 9.35
+     *   the ledger (x 3560–3880) enters frame at 8.84
+     */
+    const ROWS_Y = [210, 268, 326, 384, 442]
+    const chips = [
+      { id: 'a', row: 0, to: 3300 },
+      { id: 'b', row: 2, to: 3020 },
+      { id: 'c', row: null, to: 2740 },
+      { id: 'd', row: 4, to: 2460 },
+    ]
+
+    // Act 1 → 2: the copy hands over to the film, and the feed resolves into payments.
+    tl.to(copy, { opacity: 0, y: -30, duration: 0.8 }, 0.6)
+    tl.to('[data-narr]', { opacity: 0.22, duration: 1, stagger: { amount: 0.8 } }, 1.0)
+    tl.to('[data-chip]', { opacity: 1, duration: 0.6, stagger: 0.18 }, 1.3)
+
+    /** A caption owns the frame only while its station does. */
+    const caption = (i: number, at: number, until: number) => {
+      tl.fromTo(
+        `[data-stage-caption="${i}"]`,
+        { opacity: 0, y: 14 },
+        { opacity: 1, y: 0, duration: 0.7 },
+        at,
+      )
+      tl.to(`[data-stage-caption="${i}"]`, { opacity: 0, y: -14, duration: 0.6 }, until)
+    }
+
+    // The payments travel the rail while the camera travels with them — slightly slower, so they
+    // drift back through the frame instead of sitting nailed to one spot.
+    chips.forEach((c) => {
+      tl.to(`[data-chip="${c.id}"]`, { x: c.to, ease: 'none', duration: 5.4 }, 3.2)
+    })
+
+    caption(0, 3.2, 4.9) // INGEST
+    caption(1, 5.1, 6.9) // MATCH
+
+    // MATCH: the evidence sweep, then the connections it justifies.
+    tl.fromTo('[data-beam]', { opacity: 0, x: -130 }, { opacity: 1, x: 130, duration: 1.2 }, 5.1)
+    tl.to('[data-beam]', { opacity: 0, duration: 0.4 }, 6.1)
+    tl.to(['[data-conn="a"]', '[data-conn="b"]', '[data-conn="d"]'], {
+      attr: { 'stroke-dashoffset': 0 },
+      duration: 1.1,
+      stagger: 0.2,
+    }, 5.7)
+
+    // The exception: two candidates drawn, then retracted. Ambiguity escalates; it is never
+    // resolved by picking one.
+    tl.to(['[data-conn="c1"]', '[data-conn="c2"]'], {
+      attr: { 'stroke-dashoffset': 0 },
+      duration: 0.9,
+      stagger: 0.12,
+    }, 6.2)
+    tl.to(['[data-conn="c1"]', '[data-conn="c2"]'], {
+      attr: { 'stroke-dashoffset': 1 },
+      duration: 0.8,
+    }, 7.6)
+
+    // CLASSIFY.
+    caption(2, 7.1, 8.7)
+    tl.to('[data-tag]', { opacity: 1, duration: 0.5, stagger: 0.16 }, 7.3)
+    tl.to('[data-chip-edge="c"]', { attr: { fill: 'var(--scene-warn)' }, duration: 0.3 }, 7.7)
+
+    // POST — held until 8.9, when the ledger is genuinely in frame.
+    caption(3, 8.8, 9.9)
+    chips.forEach((c, i) => {
+      if (c.row === null) return
+      const at = 8.95 + i * 0.14
+      tl.to(`[data-chip="${c.id}"]`, { x: 3560, y: ROWS_Y[c.row]! - 27, scale: 0.8, opacity: 0, duration: 0.9 }, at)
+      tl.to(`[data-row-fill="${c.row}"]`, { attr: { width: 320 }, duration: 0.7 }, at + 0.3)
+    })
+
+    // The exception lands in the tray instead.
+    tl.to('[data-chip="c"]', { x: 3560, y: 712, scale: 0.8, opacity: 0, duration: 0.9 }, 9.2)
+    tl.to('[data-tray-item]', { opacity: 1, duration: 0.5 }, 9.6)
+
+    ScrollTrigger.addEventListener('refreshInit', () => gsap.set(camera, { x: 0 }))
+
+    film = tl
+    if (import.meta.env.DEV) {
+      ;(window as unknown as { __film?: gsap.core.Timeline }).__film = tl
+    }
+  }
+
+  const evaluate = () => {
+    if (!haveElements) return
+    if (wideEnough.matches && !reduced.matches) {
+      startFilm()
+    } else {
+      stopFilm()
+      showStatic()
+    }
+  }
+
+  evaluate()
+  wideEnough.addEventListener('change', evaluate)
+  reduced.addEventListener('change', evaluate)
+</script>

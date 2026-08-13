@@ -1,0 +1,130 @@
+---
+/**
+ * Privacy — deliberately two separate stories: this website (which collects nothing) and the
+ * product (which handles real financial data under a contract).
+ *
+ * NOT LEGALLY REVIEWED. It is factually accurate about what the site does, and it says plainly
+ * that the product's binding policy is not published yet rather than inventing one. `index={false}`
+ * keeps a placeholder out of search until counsel has seen it.
+ */
+import { url } from '@/lib/url'
+import PageHero from '@/components/PageHero.astro'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { CONTACT_EMAIL } from '@/consts'
+
+const lastUpdated = 'August 2026'
+---
+
+<BaseLayout
+  title="Privacy"
+  description="What this website collects (nothing) and how the product handles financial data."
+  index={false}
+>
+  <PageHero
+    eyebrow="Privacy"
+    title="This website collects nothing. The product is a separate story, told separately."
+    lede="Most privacy pages are long because the site behind them is doing a lot. This one is short for the opposite reason."
+  />
+
+  <section class="section-y">
+    <div class="shell">
+      <div class="border-hairline bg-surface rounded-md mb-14 max-w-3xl border p-6">
+        <p class="mono text-exception text-xs tracking-wider uppercase">Pre-launch notice</p>
+        <p class="text-ink-muted mt-3 leading-relaxed">
+          Verity is pre-launch. This page is an accurate plain-language description of what we do
+          today; it is <span class="text-ink">not</span> a legal agreement and has not been reviewed
+          by counsel. The binding privacy terms for the product are provided contractually to design
+          partners. If you need them before then, ask.
+        </p>
+      </div>
+
+      <div class="max-w-3xl space-y-14">
+        <div>
+          <h2 class="text-2xl font-medium">This website</h2>
+          <ul class="text-ink-muted mt-6 space-y-4 text-lg leading-relaxed">
+            <li>
+              <span class="text-ink">No forms.</span> There is nowhere on this site to submit
+              anything, so there is nothing for us to store.
+            </li>
+            <li>
+              <span class="text-ink">No analytics and no tracking pixels.</span> We do not know who
+              you are, which pages you read, or where you came from.
+            </li>
+            <li>
+              <span class="text-ink">No cookies</span>, which is why there is no cookie banner. There
+              is nothing to consent to.
+            </li>
+            <li>
+              <span class="text-ink">No third-party requests.</span> Fonts are self-hosted; there is
+              no CDN, no embedded video, and no chat widget. Reading this page contacts our server
+              and nothing else.
+            </li>
+          </ul>
+          <p class="text-ink-muted mt-6 leading-relaxed">
+            Our host keeps ordinary server logs (IP address, request time, page requested) for
+            operational and security purposes. If we later add privacy-preserving, cookie-free
+            analytics, this page will say so before it is switched on.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="text-2xl font-medium">The product</h2>
+          <p class="text-ink-muted mt-6 text-lg leading-relaxed">
+            The product is a different matter: it necessarily handles your financial data. How that
+            works in practice is described in detail on the
+            <a href={url("/security")} class="text-accent underline underline-offset-4">security page</a>,
+            and summarised here.
+          </p>
+          <ul class="text-ink-muted mt-6 space-y-4 text-lg leading-relaxed">
+            <li>
+              <span class="text-ink">What we hold:</span> bank transactions retrieved through your
+              Plaid connection, invoices read from your billing system, and the credit notes and
+              audit records Verity itself creates.
+            </li>
+            <li>
+              <span class="text-ink">What we do not hold:</span> your banking or accounting
+              passwords. Bank access runs through Plaid's consent flow; billing access through your
+              provider's sign-in-and-approve screen, which returns a scoped token. There is no field
+              anywhere in the product for pasting a credential.
+            </li>
+            <li>
+              <span class="text-ink">Isolation:</span> every row is scoped to your organisation and
+              enforced by the database, not by application code remembering to filter.
+            </li>
+            <li>
+              <span class="text-ink">Purpose:</span> your data is used to operate the service for
+              you. We do not sell it, and we do not use it to train models for anyone else.
+            </li>
+            <li>
+              <span class="text-ink">Sub-processors:</span> our hosting provider, Plaid for bank
+              connectivity, and the model provider used for advisory narration parsing. A current
+              list is provided to design partners and will be published here at launch.
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h2 class="text-2xl font-medium">Getting your data out, or deleted</h2>
+          <p class="text-ink-muted mt-6 text-lg leading-relaxed">
+            Design partner agreements cover export and deletion. In practice: you can disconnect a
+            feed at any time from the product, and a written deletion request reaches a person who
+            can action it. Audit records for credits already issued are retained for the period your
+            agreement specifies, because a financial audit trail that can be deleted on request is
+            not an audit trail.
+          </p>
+        </div>
+
+        <div>
+          <h2 class="text-2xl font-medium">Contact</h2>
+          <p class="text-ink-muted mt-6 text-lg leading-relaxed">
+            Privacy questions go to
+            <a href={`mailto:${CONTACT_EMAIL}`} class="text-accent underline underline-offset-4">
+              {CONTACT_EMAIL}
+            </a> and reach the people who built the system, not a ticket queue.
+          </p>
+          <p class="text-ink-subtle mono mt-8 text-xs">Last updated {lastUpdated}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

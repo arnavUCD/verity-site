@@ -1,0 +1,194 @@
+---
+/**
+ * Security — the page a buyer's security reviewer opens first.
+ *
+ * The honesty rules bind hardest here (ADR 0011 §4): we hold no certification and this page says
+ * so in plain words, in its own section rather than in a footnote. Everything else describes a
+ * mechanism that exists in the code, because a mechanism can be checked and an adjective cannot.
+ */
+import CTASection from '@/components/CTASection.astro'
+import PageHero from '@/components/PageHero.astro'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+const guarantees = [
+  {
+    title: 'One tenant can never read another',
+    how: 'Isolation is enforced by the database with row-level security, scoped per tenant — not by application code remembering to add a WHERE clause. A missing filter is a bug; a missing row-level policy is a refused query.',
+  },
+  {
+    title: 'A credit is never issued twice',
+    how: 'Every request carries an idempotency key, and every external write is drained through a recoverable queue. The dangerous case — the write succeeded but the acknowledgement was lost — is handled as its own state rather than retried blindly.',
+  },
+  {
+    title: 'Automation is never recorded as a human decision',
+    how: 'Every action is stamped at write time with the kind of actor that took it: a person, the automated pipeline, or a worker executing a decision someone already made. Automated decisions are written to their own record, never into the human decision table.',
+  },
+  {
+    title: 'Issued and rejected are final',
+    how: 'Terminal states are terminal. A correction is a new credit note with its own trail, never a quiet edit of an old one. Nothing in the product can rewrite a decision that has already been made.',
+  },
+  {
+    title: 'An agent cannot approve or issue on its own authority',
+    how: 'The agent modules import only the agent surface — they have no access to approval or issuance code paths at all. This is structural rather than procedural: it is enforced by what those modules can reach, and covered by a test that asserts it across every agent module.',
+  },
+  {
+    title: 'Invoices are read-only',
+    how: 'They belong to your billing system. Verity reads them and never writes to them; the only thing it posts is the correction it raised, through the connector you approved.',
+  },
+]
+
+const credentials = [
+  {
+    title: 'Bank access',
+    body: 'Through Plaid’s own consent flow. Your banking credentials are entered with Plaid, never with us, and never pass through our screens.',
+  },
+  {
+    title: 'Billing access',
+    body: 'Through the provider’s sign-in-and-approve flow. We receive a scoped token, stored against your organisation alone. Your password never reaches us.',
+  },
+  {
+    title: 'There is no field for pasting a key',
+    body: 'Anywhere in the product. That is deliberate, and it is why Odoo is not connectable yet: we do not yet encrypt stored credentials with a managed key, so we do not accept credentials that would require it. The intake form does not exist until the storage does.',
+  },
+  {
+    title: 'No secret can live in the browser',
+    body: 'Both the app and this site are static artefacts with no server tier of their own. There is nowhere in the web layer for an API key to be held, so the guarantee holds by absence of a tier rather than by developer discipline.',
+  },
+]
+---
+
+<BaseLayout
+  title="Security"
+  description="How Verity isolates tenants, handles credentials, and records who — or what — made every decision. Including a plain statement of what we have not yet done."
+>
+  <PageHero
+    eyebrow="Security"
+    title="Mechanisms you can check, not adjectives you have to trust."
+    lede="This product moves money and posts entries to real books. Everything below describes something enforced in code or in the database, because that is the kind of claim a security reviewer can actually verify."
+  />
+
+  {/* ------------------------------------------------------------- the guarantees */}
+  <section class="section-y">
+    <div class="shell">
+      <p class="label">What is enforced</p>
+      <h2 class="mt-4 max-w-3xl text-[clamp(1.8rem,3.2vw,2.6rem)] leading-[1.1] font-medium">
+        Six guarantees, and the thing that enforces each one.
+      </h2>
+      <ul class="mt-14 grid gap-x-14 gap-y-10 md:grid-cols-2">
+        {
+          guarantees.map((g) => (
+            <li class="border-hairline reveal border-t pt-8">
+              <h3 class="text-xl leading-snug font-medium">{g.title}</h3>
+              <p class="text-ink-muted mt-4 leading-relaxed">{g.how}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  {/* ------------------------------------------------------------------ credentials */}
+  <section class="rule-top section-y">
+    <div class="shell">
+      <div class="grid gap-14 lg:grid-cols-[0.9fr_1.1fr]">
+        <div>
+          <p class="label">Credentials</p>
+          <h2 class="mt-4 text-[clamp(1.8rem,3.2vw,2.6rem)] leading-[1.1] font-medium">
+            The safest secret is the one we never hold.
+          </h2>
+          <p class="text-ink-muted mt-6 text-lg leading-relaxed">
+            Every connection is designed so that the credential either stays with the provider or
+            never exists in a form we could leak.
+          </p>
+        </div>
+        <ul class="space-y-8">
+          {
+            credentials.map((c) => (
+              <li class="border-hairline border-b pb-8 last:border-0">
+                <h3 class="text-lg font-medium">{c.title}</h3>
+                <p class="text-ink-muted mt-3 leading-relaxed">{c.body}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  {/* ------------------------------------------------------------------- this site */}
+  <section class="rule-top section-y">
+    <div class="shell">
+      <div class="grid gap-14 lg:grid-cols-[1fr_1fr]">
+        <div>
+          <p class="label">This website</p>
+          <h2 class="mt-4 text-[clamp(1.8rem,3.2vw,2.6rem)] leading-[1.1] font-medium">
+            Collects nothing, so it can leak nothing.
+          </h2>
+          <div class="text-ink-muted mt-7 space-y-5 text-lg leading-relaxed">
+            <p>
+              There is no form on this site, no analytics, no tracking pixel, no chat widget, and no
+              cookie banner — because there is nothing to consent to. Fonts are self-hosted, so your
+              browser makes no third-party request while reading this page.
+            </p>
+            <p>
+              The only routes out are a link to the product demo and an email address. That is a
+              deliberate constraint rather than a stage we have not got to yet: a marketing site
+              that collects nothing cannot be the weak link in a security review.
+            </p>
+          </div>
+        </div>
+
+        <div class="border-hairline bg-surface rounded-lg border p-8">
+          <span class="chip chip-exception">no certification</span>
+          <h3 class="mt-5 text-xl font-medium">What we have not done</h3>
+          <div class="text-ink-muted mt-4 space-y-4 leading-relaxed">
+            <p>
+              <span class="text-ink font-medium">We hold no SOC 2, ISO 27001, or equivalent
+                certification.</span> We are pre-launch, and we are not going to imply otherwise with a
+              badge or a “compliant with the principles of” sentence.
+            </p>
+            <p>
+              <span class="text-ink font-medium">Stored credentials are not yet encrypted with a
+                managed key.</span> That is a real gap, it is why the API-key connector tier is closed,
+              and it is the reason rather than an excuse.
+            </p>
+            <p>
+              What we can do today is describe exactly how isolation, credentials, write-back and
+              audit work, and let your reviewer judge the design on its merits.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* ----------------------------------------------------------------------- audit */}
+  <section class="rule-top section-y">
+    <div class="shell">
+      <div class="max-w-3xl">
+        <p class="label">Audit</p>
+        <h2 class="mt-4 text-[clamp(1.8rem,3.2vw,2.6rem)] leading-[1.1] font-medium">
+          Every entry can name its actor and its basis.
+        </h2>
+        <div class="text-ink-muted mt-7 space-y-5 text-lg leading-relaxed">
+          <p>
+            For any credit Verity raised you can see what was decided, when, by whom — and what kind
+            of actor that was. Automated decisions carry the evidence that justified them: the
+            reference that cleared the matching floor, the invoice it was confirmed against, and the
+            classification that followed.
+          </p>
+          <p>
+            Most finance tools cannot separate their own automation from their users, which turns
+            “the system did this automatically” into an awkward discovery during an audit. Here it
+            is a recorded fact, and one you can hand to a reviewer.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CTASection
+    title="Send us your security questionnaire"
+    body="We would rather answer a hard one early than a soft one late. If your reviewer needs detail we have not published here, ask — the answer will either be the mechanism or an honest “not yet”."
+  />
+</BaseLayout>

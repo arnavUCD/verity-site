@@ -1,0 +1,53 @@
+---
+/**
+ * The primary call to action, in one place — because whether the demo is reachable is a fact about
+ * the product, not a per-page styling decision.
+ *
+ * While `CTA.available` is false it renders as a NON-INTERACTIVE element. A button that says
+ * "Demo upcoming" and still navigates somewhere is a worse lie than one that says "See the demo":
+ * it admits the thing is not ready and then asks you to click it anyway. When the demo goes live,
+ * flip the flag in consts.ts and every instance becomes a real link.
+ */
+import { CTA } from '@/consts'
+
+interface Props {
+  /** Utility classes for size and colour — each placement has its own weight. */
+  class?: string
+  /** Inline style, used by the hero where colours come from the film's scene variables. */
+  style?: string
+  /** The forward arrow only makes sense on something that actually goes somewhere. */
+  arrow?: boolean
+}
+
+const { class: className = '', style, arrow = false } = Astro.props
+const Tag = CTA.available ? 'a' : 'span'
+const attrs: Record<string, string> = CTA.available
+  ? { href: CTA.href }
+  : { 'aria-disabled': 'true' }
+// The header's dark-phase inversion targets this hook (global.css).
+---
+
+<Tag
+  {...attrs}
+  data-cta
+  style={style}
+  class:list={[className, !CTA.available && 'cursor-default select-none']}
+>
+  {CTA.label}
+  {
+    arrow && CTA.available && (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.75"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="size-4"
+        aria-hidden="true"
+      >
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
+    )
+  }
+</Tag>

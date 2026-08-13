@@ -1,0 +1,228 @@
+---
+/**
+ * Integrations — a mirror of services/billing_connect/providers.py, which DERIVES availability from
+ * whether a connect driver is registered rather than letting anyone hand-write "available".
+ *
+ * That module exists to make "we shipped the card but not the code" impossible. A hand-authored
+ * logo grid on this page would reintroduce exactly that, so the statuses and the plain-words
+ * reasons below are copied from the registry and must be updated with it (ADR 0011 §4).
+ */
+import CTASection from '@/components/CTASection.astro'
+import PageHero from '@/components/PageHero.astro'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+interface Provider {
+  name: string
+  kind: string
+  tier: 'Cloud OAuth' | 'API key' | 'Local connector' | 'Bank aggregator'
+  available: boolean
+  auth: string
+  note: string
+}
+
+const providers: Provider[] = [
+  {
+    name: 'Plaid',
+    kind: 'Bank feed',
+    tier: 'Bank aggregator',
+    available: true,
+    auth: 'You connect your bank through Plaid’s own consent flow. Your banking credentials never reach us.',
+    note: 'This is the intake side of the product. Transactions sync incrementally, every few minutes, resuming from where the last poll stopped.',
+  },
+  {
+    name: 'Zoho Books',
+    kind: 'Billing system',
+    tier: 'Cloud OAuth',
+    available: true,
+    auth: 'You are sent to Zoho to sign in and approve read access to your invoices. Your password never reaches us — we receive a token, stored against your organisation alone.',
+    note: 'Read-only to start: the connection asks for permission to read invoices and to see which organisation you picked. Issuing money back into Zoho uses a separate, narrower credential and is not part of that consent.',
+  },
+  {
+    name: 'QuickBooks Online',
+    kind: 'Billing system',
+    tier: 'Cloud OAuth',
+    available: false,
+    auth: 'Will work exactly like Zoho Books: sent to Intuit to sign in and approve read access. No password or key is ever typed into our screens.',
+    note: 'The connect flow for this tier already exists. What is missing is the adapter that turns QuickBooks invoices into the one invoice shape the rest of the product understands. Until that adapter passes our shared contract test, connecting would give you a link that reads nothing.',
+  },
+  {
+    name: 'Xero',
+    kind: 'Billing system',
+    tier: 'Cloud OAuth',
+    available: false,
+    auth: 'Will work exactly like Zoho Books: sent to Xero to sign in and approve read access.',
+    note: 'Not connectable yet, for the same reason as QuickBooks: the redirect-and-consent half is built, the adapter is not. We would rather show you this than a button that connects to nothing.',
+  },
+  {
+    name: 'Odoo',
+    kind: 'Billing system',
+    tier: 'API key',
+    available: false,
+    auth: 'Odoo does not offer the sign-in-and-approve flow the others do. It would ask you to paste an API key you generate in Odoo, plus — if you self-host — your server address and database name.',
+    note: 'Not connectable yet, and the reason is ours rather than Odoo’s: a key you paste is a secret we would have to hold, and we do not yet encrypt stored credentials with a managed key. We are not willing to keep your Odoo key in plain text in our database, so the field does not exist until that does.',
+  },
+  {
+    name: 'TallyPrime',
+    kind: 'Billing system',
+    tier: 'Local connector',
+    available: false,
+    auth: 'TallyPrime runs on your own machine, not in the cloud, so there is nothing for us to send you to. Connecting will mean installing a small connector on the computer that runs Tally and pairing it with a one-time code.',
+    note: 'Not connectable yet. Tally listens on your own computer behind your firewall, so our servers genuinely cannot reach it — this is not a missing feature we can add to a settings screen. The connector reads Tally locally and pushes out to us, so you never open a hole in your firewall. It is a real piece of software with an installer and an update path, tracked as its own project.',
+  },
+]
+
+const tiers = [
+  {
+    tier: 'Cloud OAuth',
+    what: 'Redirect, consent, callback. You approve read access in your provider’s own screens and we receive a scoped token. No secret ever touches your browser or ours.',
+    state: 'The only tier fully implemented today.',
+  },
+  {
+    tier: 'API key',
+    what: 'A key you generate and paste, plus a server address and database name for self-hosted systems — details OAuth would never carry.',
+    state: 'Blocked on encrypted credential storage, deliberately. See Odoo below.',
+  },
+  {
+    tier: 'Local connector',
+    what: 'On-premise software with no cloud identity. A small connector you install reads it locally and pushes outbound to us.',
+    state: 'A distributable application with its own installer. Not built.',
+  },
+]
+---
+
+<BaseLayout
+  title="Integrations"
+  description="Plaid for the bank feed and Zoho Books for billing are connectable today. QuickBooks, Xero, Odoo and TallyPrime each carry the real reason they are not — no logo wall, no pretend connectors."
+>
+  <PageHero
+    eyebrow="Integrations"
+    title="A short, honest list — and the real reason for every gap."
+    lede="A connector is listed as available only when it can carry you end to end. Everything else says exactly what is missing and why. We would rather show you this than a wall of logos that connect to nothing."
+  />
+
+  <section class="section-y">
+    <div class="shell">
+      <ul class="space-y-px">
+        {
+          providers.map((p) => (
+            <li class="border-hairline reveal border-t py-10">
+              <div class="grid gap-6 lg:grid-cols-[minmax(0,18rem)_1fr] lg:gap-14">
+                <div>
+                  <div class="flex items-center gap-3">
+                    <h2 class="text-2xl font-medium">{p.name}</h2>
+                    <span class:list={['chip', p.available ? 'chip-confirmed' : 'chip-neutral']}>
+                      {p.available ? 'available' : 'not yet'}
+                    </span>
+                  </div>
+                  <p class="mono text-ink-subtle mt-3 text-xs tracking-wider uppercase">
+                    {p.kind} · {p.tier}
+                  </p>
+                </div>
+                <div class="grid gap-6 sm:grid-cols-2">
+                  <div>
+                    <p class="mono text-ink-subtle text-xs tracking-wider uppercase">
+                      What connecting asks of you
+                    </p>
+                    <p class="text-ink-muted mt-3 leading-relaxed">{p.auth}</p>
+                  </div>
+                  <div>
+                    <p
+                      class:list={[
+                        'mono text-xs tracking-wider uppercase',
+                        p.available ? 'text-confirmed' : 'text-exception',
+                      ]}
+                    >
+                      {p.available ? 'What you get' : 'Why not yet'}
+                    </p>
+                    <p class="text-ink-muted mt-3 leading-relaxed">{p.note}</p>
+                  </div>
+                </div>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  {/* ------------------------------------------------------------------- the tiers */}
+  <section class="rule-top section-y">
+    <div class="shell">
+      <div class="grid gap-12 lg:grid-cols-[0.9fr_1.1fr]">
+        <div>
+          <p class="label">Three kinds of connection</p>
+          <h2 class="mt-4 text-[clamp(1.8rem,3.2vw,2.6rem)] leading-[1.1] font-medium">
+            They are not interchangeable, so we do not pretend they are.
+          </h2>
+          <p class="text-ink-muted mt-6 text-lg leading-relaxed">
+            Most integration pages flatten every system into one logo grid. The differences matter:
+            they decide what a connection asks of you, where a credential lives, and how long the
+            work takes.
+          </p>
+        </div>
+        <ul class="space-y-8">
+          {
+            tiers.map((t) => (
+              <li class="border-hairline border-b pb-8 last:border-0">
+                <h3 class="text-lg font-medium">{t.tier}</h3>
+                <p class="text-ink-muted mt-3 leading-relaxed">{t.what}</p>
+                <p class="mono text-ink-subtle mt-3 text-xs">{t.state}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  {/* ------------------------------------------------------------ canonical invoice */}
+  <section class="rule-top section-y">
+    <div class="shell">
+      <div class="grid gap-14 lg:grid-cols-[1fr_1fr]">
+        <div>
+          <p class="label">Under the connectors</p>
+          <h2 class="mt-4 text-[clamp(1.8rem,3.2vw,2.6rem)] leading-[1.1] font-medium">
+            One invoice shape, whatever your system calls it.
+          </h2>
+          <div class="text-ink-muted mt-7 space-y-5 text-lg leading-relaxed">
+            <p>
+              Every adapter maps your billing system’s invoices into a single canonical shape. The
+              matching and classification logic only ever sees that shape — never a vendor’s raw
+              format.
+            </p>
+            <p>
+              This is why a new connector is a contained piece of work rather than a rewrite, and
+              why an adapter has to pass a shared contract test before it can be switched on. It is
+              also why we will not list a provider as available on the strength of a login screen.
+            </p>
+          </div>
+        </div>
+        <div class="border-hairline bg-surface rounded-lg border p-8">
+          <p class="label">Two boundaries we hold</p>
+          <ul class="mt-6 space-y-6">
+            <li>
+              <h3 class="font-medium">Invoices are read-only</h3>
+              <p class="text-ink-muted mt-2 leading-relaxed">
+                They are owned by your billing system and we never claim otherwise. Verity reads
+                them; it does not create, edit or import them.
+              </p>
+            </li>
+            <li>
+              <h3 class="font-medium">The credit note is ours</h3>
+              <p class="text-ink-muted mt-2 leading-relaxed">
+                Verity is the source of truth for the corrections it raises, with the full state
+                history and audit trail behind them. Your ledger’s view is kept consistent with it
+                by the write-back, not the other way round.
+              </p>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CTASection
+    title="On a system we don’t support yet?"
+    body="Tell us which one. Design partners move their accounting system up the connector roadmap, and we would rather build the next adapter against a real customer’s data than a sandbox."
+  />
+</BaseLayout>
