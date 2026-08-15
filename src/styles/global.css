@@ -2,11 +2,18 @@
 
 /* Self-hosted, so the site makes no third-party font request — one fewer origin in the privacy
    story /security has to tell. Two faces, one job each (ADR 0012 §3): Geist carries text;
-   JetBrains Mono carries every MACHINE ARTEFACT — invoice refs, amounts, narration, state names.
+   IBM Plex Mono carries every MACHINE ARTEFACT — invoice refs, amounts, narration, state names.
    That assignment is semantic, not stylistic: the mono face means "this is a literal value the
-   system handled", which is the exact distinction the product sells. */
+   system handled", which is the exact distinction the product sells.
+
+   Plex rather than a grotesque mono, deliberately. The default developer monos (JetBrains, Geist
+   Mono, and their kin) read as TERMINAL, which on an AI product lands as the house style of every
+   other AI product. Plex was drawn for IBM's industrial and documentation work: humanist curves,
+   less rigid, closer to a printed statement than to a code editor — which is what the bank feed
+   actually is. Static weights (400/500, latin only) because Plex Mono ships no variable build. */
 @import '@fontsource-variable/geist';
-@import '@fontsource-variable/jetbrains-mono';
+@import '@fontsource/ibm-plex-mono/latin-400.css';
+@import '@fontsource/ibm-plex-mono/latin-500.css';
 
 /* ============================================================================
    Verity marketing — the "Instrument" design system (ADR 0012).
@@ -48,7 +55,7 @@
   --color-exception-wash: #fdf1e3;
 
   --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'SF Mono', monospace;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
 
   /* Small radii. A 28px corner reads as friendly; this system is not trying to be. */
   --radius-xs: 3px;
@@ -204,7 +211,6 @@
 @utility mono {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
-  font-feature-settings: 'zero' 1; /* slashed zero — this is a system's output, and it should look like one */
 }
 
 /* The small mono label that sits above a heading. Used sparingly: it is the
