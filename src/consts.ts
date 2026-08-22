@@ -25,7 +25,7 @@ export const SITE_URL = 'https://verity.example.com'
  *
  * KNOWN GAP (ADR 0011 §7): the app still greets visitors as "EOS". Renaming it is its own change.
  */
-export const APP_URL = 'https://app.verity.example.com'
+export const APP_URL = 'https://frontend-production-2175.up.railway.app'
 
 /** TODO(contact): a real inbox, not a personal address. The site has no form — this is the only route in. */
 export const CONTACT_EMAIL = 'hello@verity.example.com'
@@ -56,4 +56,4 @@ export const NAV: NavItem[] = [
  * and still navigates is worse than one that does not admit it. Flip it when the demo is live
  * and every placement becomes a real link again.
  */
-export const CTA = { href: APP_URL, label: 'Demo upcoming', available: false }
+export const CTA = { href: APP_URL, label: 'Demo', available: true }
