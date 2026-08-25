@@ -19,21 +19,15 @@ interface Props {
   description?: string
   /** Set false on legal/utility pages that should not compete in search. */
   index?: boolean
-  /**
-   * True on the one page whose hero is the dark scroll film. It stamps the phase on <html>
-   * server-side so the header ships already inverted — flipping it from a script would flash a
-   * light header over a near-black hero on every load.
-   */
-  heroFilm?: boolean
 }
 
-const { title, description = SITE_DESCRIPTION, index = true, heroFilm = false } = Astro.props
+const { title, description = SITE_DESCRIPTION, index = true } = Astro.props
 const canonical = new URL(Astro.url.pathname, Astro.site).href
 const fullTitle = `${title} · ${SITE_NAME}`
 ---
 
 <!doctype html>
-<html lang="en" data-film-phase={heroFilm ? 'dark' : undefined}>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

@@ -3,9 +3,9 @@
  * The hero: a full-bleed, scroll-scrubbed film of the entire pipeline.
  *
  * The camera travels a scene four times wider than the viewport — feed → ingest → match →
- * classify → post → report — while the palette resolves from near-black to the page's own canvas,
- * so the film hands off into the light content below with no seam. Scroll IS the transport: the
- * payment moves because you moved.
+ * classify → post → report — on ONE light palette throughout, so the film hands off into the
+ * ordinary light content below with no seam and no dark act. Scroll IS the transport: the payment
+ * moves because you moved.
  *
  * WHY IT IS BUILT THIS WAY, in order of what would break first if ignored:
  *
@@ -13,12 +13,12 @@
  *    one viewport tall and shows act one — a complete, readable hero. Had the 460vh lived in the
  *    stylesheet, a failed script would leave four blank screens to scroll past, which is the
  *    ADR 0012 §5 failure in its most expensive form.
- * 2. COLOUR IS SIX CSS VARIABLES, INTERPOLATED IN ONE onUpdate. Every mark and every word of copy
- *    reads from them, so the dark→light resolve is one lerp rather than sixty tweens that can
- *    disagree about what phase they are in. It also means the copy stays legible at every point
- *    on the scroll, which is the thing a dark-to-light hero usually gets wrong.
- * 3. THE HEADER FOLLOWS THE FILM. `data-film-phase` on <html> flips the sticky header to its
- *    inverted treatment while the stage is dark; the header would otherwise be black-on-black.
+ * 2. COLOUR IS SIX CSS VARIABLES, READ FROM THE STYLESHEET, NEVER TWEENED. Every mark and every
+ *    word of copy reads them from `[data-stage]` (global.css) — the same values whether the film
+ *    is running, static, or not yet hydrated — so there is nothing for JS to get right or wrong
+ *    about colour, and no seam between "hero" and the page.
+ * 3. THE HEADER DOES NOT INVERT. With no dark act there is nothing for it to invert against — it
+ *    keeps its ordinary light treatment for the whole scroll.
  * 4. NO PINNING BELOW 900px OR UNDER REDUCED MOTION. Both fall back to the same static hero as
  *    the no-JS case, rather than to a degraded version of the film.
  */
@@ -413,65 +413,6 @@ const ROW_W = 320
   const wideEnough = window.matchMedia('(min-width: 900px) and (min-aspect-ratio: 8/5)')
 
   /**
-   * The two palettes. Every mark in the scene and every word of hero copy reads these six
-   * variables, so the whole resolve is one interpolation — see the header comment, point 2.
-   * The dark values are brightened, not just inverted: #3730ff on near-black is unreadable, and
-   * a state colour that dims as the background darkens stops being a state colour.
-   */
-  const DARK = {
-    '--scene-bg': [11, 11, 12],
-    '--scene-ink': [250, 250, 249],
-    '--scene-muted': [168, 168, 176],
-    '--scene-dim': [92, 92, 100],
-    '--scene-line': [48, 48, 54],
-    '--scene-surface': [23, 23, 27],
-    '--scene-accent': [139, 132, 255],
-    '--scene-ok': [61, 220, 154],
-    '--scene-warn': [240, 166, 62],
-  }
-  /**
-   * The midpoint. Interpolating near-black straight to paper passes through flat neutral grey,
-   * which looks like a fade rather than a dawn. Routing through a cool slate keeps a hue in the
-   * middle of the transition, so the resolve reads as light arriving rather than as opacity.
-   */
-  const MID = {
-    '--scene-bg': [39, 42, 50],
-    '--scene-ink': [236, 238, 242],
-    '--scene-muted': [178, 182, 191],
-    '--scene-dim': [122, 127, 138],
-    '--scene-line': [68, 73, 84],
-    '--scene-surface': [48, 52, 62],
-    '--scene-accent': [122, 116, 255],
-    '--scene-ok': [45, 195, 137],
-    '--scene-warn': [224, 154, 68],
-  }
-  const LIGHT = {
-    '--scene-bg': [250, 250, 249],
-    '--scene-ink': [11, 11, 12],
-    '--scene-muted': [82, 82, 91],
-    '--scene-dim': [138, 138, 147],
-    '--scene-line': [231, 229, 226],
-    '--scene-surface': [255, 255, 255],
-    '--scene-accent': [55, 48, 255],
-    '--scene-ok': [10, 127, 95],
-    '--scene-warn': [180, 83, 9],
-  }
-
-  const paint = (t: number, el: HTMLElement) => {
-    // Two segments through MID, rather than one straight lerp — see the note on MID above.
-    const first = t < 0.5
-    const from = first ? DARK : MID
-    const to = first ? MID : LIGHT
-    const k = first ? t * 2 : (t - 0.5) * 2
-    for (const key of Object.keys(DARK) as (keyof typeof DARK)[]) {
-      const a = from[key]
-      const b = to[key]
-      const c = [0, 1, 2].map((i) => Math.round(a[i]! + (b[i]! - a[i]!) * k))
-      el.style.setProperty(key, `rgb(${c[0]} ${c[1]} ${c[2]})`)
-    }
-  }
-
-  /**
    * THE GATE IS RE-EVALUATED, NOT DECIDED ONCE AT LOAD.
    *
    * Both conditions can change during a visit: a window dragged wider or maximised, a tablet
@@ -482,15 +423,13 @@ const ROW_W = 320
   const haveElements = Boolean(section && stage && scene && camera)
   let film: gsap.core.Timeline | null = null
 
-  /** Act one, in full light, as an ordinary hero — the no-JS, too-narrow and reduced-motion case. */
+  /** Act one, as an ordinary hero — the no-JS, too-narrow and reduced-motion case. */
   const showStatic = () => {
     if (!haveElements) return
-    paint(1, stage!)
     stage!.style.height = 'auto'
     stage!.classList.remove('sticky', 'top-0')
     stage!.classList.add('py-24')
     section!.style.height = ''
-    document.documentElement.dataset.filmPhase = 'light'
     gsap.set(camera, { x: 0 })
     gsap.set('[data-copy]', { clearProps: 'all' })
     gsap.set('[data-chip]', { opacity: 1, x: 0, y: 0, scale: 1 })
@@ -513,8 +452,6 @@ const ROW_W = 320
   const startFilm = () => {
     if (film || !haveElements) return
     stage!.classList.remove('py-24')
-    paint(0, stage!)
-    document.documentElement.dataset.filmPhase = 'dark'
     // The tall scroll height is applied HERE, never in CSS — see the header comment, point 1.
     section!.style.height = '460vh'
     stage!.classList.add('sticky', 'top-0')
@@ -539,23 +476,6 @@ const ROW_W = 320
         // resize (or a rotated tablet) keeps panning to the old viewport's distance and either
         // overshoots past the scene's edge or stops short of the ledger.
         invalidateOnRefresh: true,
-        onUpdate: ({ progress }) => {
-          // The light arrives WITH THE POSTING, not before it. The film's whole argument is that
-          // work gets resolved, so the ground should turn as the resolution happens: the POST
-          // beats run at timeline 8.95–9.6 of 10, i.e. progress ~0.89–0.96, and this window is
-          // aimed at exactly that. Everything up to CLASSIFY stays in the dark it started in.
-          //
-          // LINEAR, deliberately. An ease-in-out accelerates through the middle, and sRGB
-          // interpolation already rushes there on its own — together they produced a visible
-          // lurch from near-black to near-white inside a single band of scroll. Linear tracks
-          // the scrollbar evenly, which is what makes the resolve read as light arriving rather
-          // than as a cut. The slate midpoint (MID) keeps the middle from being mud.
-          const t = gsap.utils.clamp(0, 1, (progress - 0.74) / 0.24)
-          paint(t, stage!)
-          // Flipped where the ground actually crosses into light, not at the tween's midpoint —
-          // the header is unreadable in either treatment over a half-lit slate.
-          document.documentElement.dataset.filmPhase = t > 0.7 ? 'light' : 'dark'
-        },
       },
     })
 

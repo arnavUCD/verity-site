@@ -45,8 +45,9 @@
   --color-hairline: #e7e5e2;
   --color-hairline-strong: #d6d3ce;
 
-  --color-accent: #3730ff; /* 8.9:1 on canvas */
-  --color-accent-wash: #eeedff;
+  --color-accent: #175ba6; /* 6.5:1 on canvas — navy blue, text/buttons/links/focus */
+  --color-accent-wash: #eaf3ff; /* pale tint — selection highlight, chip fills (accent text sits on this) */
+  --color-accent-bright: #78bbff; /* borders, dividers, decorative fills — no text ever sits on this alone */
 
   /* State vocabulary. See rule 2 in the banner. */
   --color-confirmed: #0a7f5f; /* 4.8:1 */
@@ -105,71 +106,25 @@
 /* ============================================================================
    The hero film's palette (ADR 0012 §10).
 
-   Six variables that every mark in the scene and every word of hero copy reads. The film
-   interpolates them from dark to light across the scroll; these are the values the page ships
-   with, so the hero is complete and legible BEFORE any script runs — dark, on act one, exactly
-   where the film would start. No flash, and no dependency on JS to make text visible.
-
-   The media query is the no-film case (too narrow to pin, or reduced motion). It resolves the
-   palette to light in CSS rather than waiting for the script, for the same reason.
+   Six variables that every mark in the scene and every word of hero copy reads. The film stays on
+   ONE light palette throughout the whole scroll — no dark act, no resolve — so these are also the
+   values the page ships with before any script runs, and the values the no-film case (too narrow
+   to pin, or reduced motion) uses too. Same palette everywhere means no flash, and no seam between
+   the "hero" and the ordinary light content below it.
    ============================================================================ */
 
 [data-stage] {
-  --scene-bg: #0b0b0c;
-  --scene-ink: #fafaf9;
-  --scene-muted: #a8a8b0;
-  --scene-dim: #5c5c64;
-  --scene-line: #303036;
-  --scene-surface: #17171b;
-  /* Brightened for a dark ground: #3730ff on near-black is unreadable, and a state colour that
-     dims as the background darkens has stopped being a state colour. */
-  --scene-accent: #8b84ff;
-  --scene-ok: #3ddc9a;
-  --scene-warn: #f0a63e;
+  --scene-bg: #fafaf9;
+  --scene-ink: #0b0b0c;
+  --scene-muted: #52525b;
+  --scene-dim: #8a8a93;
+  --scene-line: #e7e5e2;
+  --scene-surface: #ffffff;
+  --scene-accent: #175ba6;
+  --scene-ok: #0a7f5f;
+  --scene-warn: #b45309;
 
   background: var(--scene-bg);
-}
-
-@media (max-width: 899px), (max-aspect-ratio: 8/5), (prefers-reduced-motion: reduce) {
-  [data-stage] {
-    --scene-bg: #fafaf9;
-    --scene-ink: #0b0b0c;
-    --scene-muted: #52525b;
-    --scene-dim: #8a8a93;
-    --scene-line: #e7e5e2;
-    --scene-surface: #ffffff;
-    --scene-accent: #3730ff;
-    --scene-ok: #0a7f5f;
-    --scene-warn: #b45309;
-  }
-}
-
-/* The header sits over the stage, so it follows the film's phase — it would otherwise be
-   black-on-black for the first three acts. Scoped to the same conditions under which the film
-   actually runs, so the no-film hero keeps the ordinary light header. */
-@media (min-width: 900px) and (min-aspect-ratio: 8/5) and (prefers-reduced-motion: no-preference) {
-  html[data-film-phase='dark'] [data-site-header] {
-    background: transparent;
-    backdrop-filter: none;
-    border-bottom-color: rgb(255 255 255 / 0.07);
-  }
-  html[data-film-phase='dark'] [data-site-header] [data-wordmark] {
-    color: #fafaf9;
-  }
-  html[data-film-phase='dark'] [data-site-header] [data-wordmark] span:first-child {
-    border-color: rgb(255 255 255 / 0.22);
-  }
-  html[data-film-phase='dark'] [data-site-header] [data-nav-link] {
-    color: #a8a8b0;
-  }
-  html[data-film-phase='dark'] [data-site-header] [data-nav-link]:hover,
-  html[data-film-phase='dark'] [data-site-header] [data-nav-link][aria-current='page'] {
-    color: #fafaf9;
-  }
-  html[data-film-phase='dark'] [data-site-header] [data-cta] {
-    background: #fafaf9;
-    color: #0b0b0c;
-  }
 }
 
 [data-site-header],
