@@ -27,6 +27,16 @@ export const SITE_URL = 'https://verity.example.com'
  */
 export const APP_URL = 'https://frontend-production-2175.up.railway.app'
 
+/**
+ * Where a CTA actually lands: the app's front door, named explicitly.
+ *
+ * `APP_URL` on its own works only by accident — the root is a guarded lane, so an unauthenticated
+ * visitor is bounced to `/welcome` by the shell's redirect. Depending on a redirect to reach the
+ * page every marketing link is *for* means the destination is only ever one routing change away
+ * from silently becoming something else. Naming it costs nothing and makes the handoff explicit:
+ * the site hands off to sign in / set up a workspace, not to a dashboard nobody can see yet. */
+export const APP_ENTRY_URL = `${APP_URL}/welcome`
+
 /** TODO(contact): a real inbox, not a personal address. The site has no form — this is the only route in. */
 export const CONTACT_EMAIL = 'hello@verity.example.com'
 
@@ -56,4 +66,4 @@ export const NAV: NavItem[] = [
  * and still navigates is worse than one that does not admit it. Flip it when the demo is live
  * and every placement becomes a real link again.
  */
-export const CTA = { href: APP_URL, label: 'Demo', available: true }
+export const CTA = { href: APP_ENTRY_URL, label: 'Demo', available: true }
