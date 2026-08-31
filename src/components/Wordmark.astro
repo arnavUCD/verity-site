@@ -1,11 +1,14 @@
 ---
 /**
- * Placeholder wordmark. The mark is an equals sign in a hairline square: reconciliation is
- * literally the act of making two records agree, and "=" is the shortest possible statement of
- * that. It is also the one glyph that stays correct as the product's scope grows — a check mark
- * would have encoded the approval step we are removing.
+ * The product mark: the dome from the poster the app's hero is built on.
  *
- * TODO(brand): swap for the real mark when one exists.
+ * It replaces a placeholder equals sign, which stood for reconciliation — two records made to
+ * agree — and was always holding the spot for a real mark. The dome is the one piece of that
+ * artwork that survives being shrunk to 24px; the drawn wordmark above it turns to mush.
+ *
+ * Kept identical to the app's (frontend/src/app/Wordmark.tsx), down to the arc and the colour,
+ * because a visitor crossing from this site into the product should not have to wonder whether
+ * they are in the right place. Change one, change the other.
  */
 interface Props {
   href?: string
@@ -21,12 +24,16 @@ const Tag = href ? 'a' : 'div'
   class={`group inline-flex items-center gap-2.5 ${className}`}
   aria-label="Verity — home"
 >
-  <span
-    class="border-hairline-strong rounded-xs group-hover:border-accent grid size-6 place-items-center border transition-colors duration-300"
-  >
-    <svg viewBox="0 0 16 16" class="text-accent size-3.5" aria-hidden="true">
-      <rect x="3" y="6" width="10" height="1.4" rx="0.4" fill="currentColor"></rect>
-      <rect x="3" y="9.2" width="10" height="1.4" rx="0.4" fill="currentColor"></rect>
+  <!-- No enclosing square: the dome is a shape rather than a glyph, and boxing it made a
+       dome-in-a-box, which is not what the poster does. The hover cue moved to the fill. -->
+  <span class="grid size-6 shrink-0 place-items-center">
+    <svg
+      viewBox="0 0 16 16"
+      class="text-indigo group-hover:text-accent size-6 transition-colors duration-300"
+      aria-hidden="true"
+    >
+      <!-- One arc from (2,11) to (14,11) at r=6 is exactly a semicircle; `z` closes the flat. -->
+      <path d="M2 11a6 6 0 0 1 12 0z" fill="currentColor"></path>
     </svg>
   </span>
   <span class="text-[1.0625rem] font-medium tracking-[-0.03em]">Verity</span>

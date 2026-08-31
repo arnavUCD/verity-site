@@ -46,6 +46,12 @@
   --color-hairline-strong: #d6d3ce;
 
   --color-accent: #175ba6; /* 6.5:1 on canvas — navy blue, text/buttons/links/focus */
+
+  /* The BRAND MARK's colour, and only that. Sampled from the poster the app's hero is built on,
+     so the dome reads as the same object on both sides of the handoff — a visitor arriving here
+     from the app should not have to wonder. Deliberately NOT part of the state vocabulary (rule
+     2 in the banner): it never means anything, it is just what the mark is made of. */
+  --color-indigo: #2b2478;
   --color-accent-wash: #eaf3ff; /* pale tint — selection highlight, chip fills (accent text sits on this) */
   --color-accent-bright: #78bbff; /* borders, dividers, decorative fills — no text ever sits on this alone */
 
