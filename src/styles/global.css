@@ -1,19 +1,16 @@
 @import 'tailwindcss';
 
 /* Self-hosted, so the site makes no third-party font request — one fewer origin in the privacy
-   story /security has to tell. Two faces, one job each (ADR 0012 §3): Geist carries text;
-   IBM Plex Mono carries every MACHINE ARTEFACT — invoice refs, amounts, narration, state names.
-   That assignment is semantic, not stylistic: the mono face means "this is a literal value the
-   system handled", which is the exact distinction the product sells.
+   story /security has to tell. Two faces, one job each (ADR 0012 §3): Geist carries ALL prose,
+   headings and labels; Source Code Pro carries every MACHINE ARTEFACT — invoice refs, amounts,
+   narration, state names. That assignment is semantic, not stylistic: the mono face means "this
+   is a literal value the system handled", which is the exact distinction the product sells.
 
-   Plex rather than a grotesque mono, deliberately. The default developer monos (JetBrains, Geist
-   Mono, and their kin) read as TERMINAL, which on an AI product lands as the house style of every
-   other AI product. Plex was drawn for IBM's industrial and documentation work: humanist curves,
-   less rigid, closer to a printed statement than to a code editor — which is what the bank feed
-   actually is. Static weights (400/500, latin only) because Plex Mono ships no variable build. */
+   SOURCE CODE PRO REPLACES IBM PLEX MONO (ADR 0012 §13), on the user's direction. One mono face
+   now covers both machine artefacts and figures, which is why the separate `figure` role added
+   for the film's amounts is gone again — it existed only to hold a second numeric face. */
 @import '@fontsource-variable/geist';
-@import '@fontsource/ibm-plex-mono/latin-400.css';
-@import '@fontsource/ibm-plex-mono/latin-500.css';
+@import '@fontsource-variable/source-code-pro';
 
 /* ============================================================================
    Verity marketing — the "Instrument" design system (ADR 0012).
@@ -73,7 +70,7 @@
   --color-exception-wash: #fdf1e3;
 
   --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
+  --font-mono: 'Source Code Pro Variable', ui-monospace, 'SF Mono', monospace;
 
   /* Small radii. A 28px corner reads as friendly; this system is not trying to be. */
   --radius-xs: 3px;
@@ -191,33 +188,26 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* A FIGURE set in the TEXT face — the money amounts in the hero film, and nothing else yet.
-   A narrow, deliberate exception to ADR 0012 §3's semantic mono assignment, taken on the user's
-   direction: in the film the amounts sit directly beside display type, and Plex there read as a
-   different document rather than the same one.
 
-   `tabular-nums` is the part that must not be dropped. It is what holds an amount column straight,
-   and §3's side argument for mono was that it supplied tabular figures for free. Geist supplies
-   them too, so the column survives the swap — which is the only reason this exception is cheap.
+/* The small label above a heading. Used sparingly: it is the schematic's callout, and it stops
+   working the moment it is everywhere.
 
-   The narration, refs and state names AROUND them stay mono. That split is the whole point: act
-   one's argument is that bank narration is a machine artefact you are forced to read, and setting
-   it in the text face would throw away the distinction the film exists to draw. */
-@utility figure {
-  font-family: var(--font-sans);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.012em;
-}
+   IT IS NO LONGER MONO (ADR 0012 §13). Setting editorial eyebrows in the machine face was the one
+   place §3's semantic rule leaked: a section heading like "The pipeline" is the site TALKING, not
+   a literal value the system produced, so the mono face was claiming something untrue about it.
+   Moving labels to Geist narrows mono to exactly what §3 says it means, and the rule reads more
+   sharply for it than it did when it had this exception sitting inside it.
 
-/* The small mono label that sits above a heading. Used sparingly: it is the
-   schematic's callout, and it stops working the moment it is everywhere. */
+   It also carries BRAND colour now rather than the subtle grey, which is most of the "add colour
+   to the page" ask: the eyebrow is the first mark of every section, so colouring it tints the
+   whole page without touching a single word of body copy. */
 @utility label {
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.14em;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--color-ink-subtle);
+  color: var(--color-brand-mid);
 }
 
 /* ============================================================================
@@ -375,17 +365,44 @@
 }
 
 /* Card hover. Depth still comes from the hairline and from alignment (ADR 0012 §2) — the lift is
-   two pixels and a border that warms to the brand blue, NOT a shadow. A shadow here would say
-   "soft", and the whole argument is precision. */
+   two pixels, a border that warms to the brand blue, and the faintest brand tint. NOT a shadow:
+   a shadow here would say "soft", and the whole argument is precision. */
 @utility lift {
   transition:
     transform 0.4s cubic-bezier(0.2, 0.7, 0.3, 1),
-    border-color 0.4s ease;
+    border-color 0.4s ease,
+    background-color 0.4s ease;
 
   &:hover {
     transform: translateY(-2px);
     border-color: var(--color-brand-mid);
+    background-color: color-mix(in srgb, var(--color-accent-wash) 45%, var(--color-surface));
   }
+}
+
+/* The section's opening mark: a short brand-gradient bar above the eyebrow, drawing itself as the
+   section arrives. This is the page's most visible piece of colour, and it is deliberately
+   STRUCTURAL rather than decorative — it marks where a section begins, which a page built entirely
+   from full-bleed hairlines could not previously say. The gradient is the poster's dome laid on
+   its side, the same one `rule-brand` uses.
+
+   Zero-width is its `from` keyframe, so — like every reveal here — an inactive timeline leaves it
+   at its BASE state, which is fully drawn. Nothing is hidden waiting to be rescued. */
+@utility accent-bar {
+  display: block;
+  height: 3px;
+  width: 3.25rem;
+  border-radius: 2px;
+  background-image: linear-gradient(
+    90deg,
+    var(--color-brand) 0%,
+    var(--color-brand-mid) 55%,
+    var(--color-accent-bright) 100%
+  );
+  transform-origin: left;
+  animation: rule-draw linear both;
+  animation-timeline: view();
+  animation-range: entry 0% entry 40%;
 }
 
 /* Every animation on this site is decorative by decision (ADR 0012 §5), so turning
@@ -403,6 +420,7 @@
   .reveal-i,
   .rule-draw,
   .rule-brand,
+  .accent-bar,
   .accent-resolve {
     animation: none !important;
     opacity: 1 !important;

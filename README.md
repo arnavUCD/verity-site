@@ -6,7 +6,11 @@ Astro + Tailwind v4, static, zero JS on any page without an island.
   The source of every claim, positioning line, and use case. Read it before writing copy.
 - **How it is built** — [ADR 0011](../docs/adr/0011-marketing-site.md).
 - **How it looks and moves** — [ADR 0012](../docs/adr/0012-marketing-design-system.md), the
-  "Instrument" design system.
+  "Instrument" design system. Two faces: **Geist** for everything the site says, **Source Code
+  Pro** for everything the system produced (refs, narration, state names, amounts). That split is
+  semantic, so an editorial eyebrow set in the mono face is a bug, not a style choice —
+  ADR 0012 §13.3. Quick audit: any `.mono` element whose computed `text-transform` is `uppercase`
+  is almost certainly editorial text wearing the machine face.
 
 This is **not** the app. The operator UI is [`frontend/`](../frontend/), it lives on `app.<domain>`,
 and it is the only surface with a session, an API call, or a token. The two deliberately no longer

@@ -108,7 +108,8 @@ const types = [
   {/* ----------------------------------------------------------------- the six steps */}
   <section id="pipeline" class="rule-top section-y">
     <div class="shell">
-      <p class="label">The pipeline</p>
+      <span class="accent-bar mb-4" aria-hidden="true"></span>
+          <p class="label">The pipeline</p>
       <h2 class="mt-4 max-w-3xl text-[clamp(1.8rem,3.2vw,2.6rem)] leading-[1.1] font-medium">
         Six steps, in order, every few minutes.
       </h2>
@@ -128,7 +129,7 @@ const types = [
                 <p class="text-lg leading-relaxed">{step.body}</p>
               </div>
               <div class="md:pt-1">
-                <p class="mono text-ink-subtle text-xs tracking-wide uppercase">{step.line}</p>
+                <p class="text-ink-subtle text-xs font-semibold tracking-[0.08em] uppercase">{step.line}</p>
                 <p class="text-ink-muted mt-3 leading-relaxed">{step.detail}</p>
               </div>
             </li>
@@ -143,6 +144,7 @@ const types = [
     <div class="shell">
       <div class="grid gap-14 lg:grid-cols-[1fr_1fr]">
         <div>
+          <span class="accent-bar mb-4" aria-hidden="true"></span>
           <p class="label">The matching floor</p>
           <h2 class="mt-4 text-[clamp(1.8rem,3.2vw,2.6rem)] leading-[1.1] font-medium">
             The model advises. It never authorizes.
@@ -175,7 +177,8 @@ const types = [
 
         <div>
           <div class="border-hairline bg-surface rounded-lg lift border p-6 sm:p-8">
-            <p class="label">Classification</p>
+            <span class="accent-bar mb-4" aria-hidden="true"></span>
+          <p class="label">Classification</p>
             <ul class="mt-6 space-y-6">
               {
                 types.map((c) => (
@@ -206,6 +209,7 @@ const types = [
     <div class="shell">
       <div class="grid gap-14 lg:grid-cols-[1.1fr_0.9fr]">
         <div>
+          <span class="accent-bar mb-4" aria-hidden="true"></span>
           <p class="label">Oversight</p>
           <h2 class="mt-4 text-[clamp(1.8rem,3.2vw,2.6rem)] leading-[1.1] font-medium">
             Your 5:30pm, not your 9am.

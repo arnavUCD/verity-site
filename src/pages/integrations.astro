@@ -114,13 +114,13 @@ const tiers = [
                       {p.available ? 'available' : 'not yet'}
                     </span>
                   </div>
-                  <p class="mono text-ink-subtle mt-3 text-xs tracking-wider uppercase">
+                  <p class="text-ink-subtle mt-3 text-xs font-semibold tracking-[0.08em] uppercase">
                     {p.kind} · {p.tier}
                   </p>
                 </div>
                 <div class="grid gap-6 sm:grid-cols-2">
                   <div>
-                    <p class="mono text-ink-subtle text-xs tracking-wider uppercase">
+                    <p class="text-ink-subtle text-xs font-semibold tracking-[0.08em] uppercase">
                       What connecting asks of you
                     </p>
                     <p class="text-ink-muted mt-3 leading-relaxed">{p.auth}</p>
@@ -128,7 +128,7 @@ const tiers = [
                   <div>
                     <p
                       class:list={[
-                        'mono text-xs tracking-wider uppercase',
+                        'text-xs font-semibold tracking-[0.08em] uppercase',
                         p.available ? 'text-confirmed' : 'text-exception',
                       ]}
                     >
@@ -150,6 +150,7 @@ const tiers = [
     <div class="shell">
       <div class="grid gap-12 lg:grid-cols-[0.9fr_1.1fr]">
         <div>
+          <span class="accent-bar mb-4" aria-hidden="true"></span>
           <p class="label">Three kinds of connection</p>
           <h2 class="mt-4 text-[clamp(1.8rem,3.2vw,2.6rem)] leading-[1.1] font-medium">
             They are not interchangeable, so we do not pretend they are.
@@ -166,7 +167,7 @@ const tiers = [
               <li class="border-hairline border-b pb-8 last:border-0">
                 <h3 class="text-lg font-medium">{t.tier}</h3>
                 <p class="text-ink-muted mt-3 leading-relaxed">{t.what}</p>
-                <p class="mono text-ink-subtle mt-3 text-xs">{t.state}</p>
+                <p class="text-ink-subtle mt-3 text-xs">{t.state}</p>
               </li>
             ))
           }
@@ -180,6 +181,7 @@ const tiers = [
     <div class="shell">
       <div class="grid gap-14 lg:grid-cols-[1fr_1fr]">
         <div>
+          <span class="accent-bar mb-4" aria-hidden="true"></span>
           <p class="label">Under the connectors</p>
           <h2 class="mt-4 text-[clamp(1.8rem,3.2vw,2.6rem)] leading-[1.1] font-medium">
             One invoice shape, whatever your system calls it.
@@ -198,6 +200,7 @@ const tiers = [
           </div>
         </div>
         <div class="border-hairline bg-surface rounded-lg lift border p-8">
+          <span class="accent-bar mb-4" aria-hidden="true"></span>
           <p class="label">Two boundaries we hold</p>
           <ul class="mt-6 space-y-6">
             <li>

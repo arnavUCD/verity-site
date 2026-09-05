@@ -147,15 +147,14 @@ const ROW_W = 320
                   >
                     {line.desc}
                   </text>
-                  {/* The AMOUNT is a `figure`, not a `mono` — set in the text face, still on
-                      tabular numerals so the column stays straight. The narration beside it stays
-                      mono, because that is the machine artefact act one is arguing about. */}
+                  {/* Amount and narration are both machine artefacts, so both are mono — which is
+                      Source Code Pro now (ADR 0012 §13). The `figure` role that briefly set these
+                      in the text face is gone with it. */}
                   <text
                     x="1404"
                     y={y}
-                    class="figure"
+                    class="mono"
                     font-size="15"
-                    font-weight="500"
                     text-anchor="end"
                     fill={line.tick ? 'var(--scene-ink)' : 'var(--scene-dim)'}
                   >
@@ -375,10 +374,17 @@ const ROW_W = 320
                   {chip.tag}
                 </text>
               </g>
+              {/* THE BOX MUST BE WIDER THAN THE TEXT IT HOLDS — it was not. The amount is
+                  right-anchored at x=248 and the plate is 268 wide, giving it 20 units of inset.
+                  The previous pair (anchor 244, plate 232) put the figure's right edge twelve
+                  units OUTSIDE the plate, so every amount hung off the end of its own chip and the
+                  rail ran straight through it. Widening the plate rather than pulling the anchor
+                  in keeps the ref and the amount from crowding: "INV-1042" ends near x=113 and
+                  "$48,500.00" starts near x=146. Chips sit 300 apart, so 268 still leaves a gap. */}
               <rect
                 x="0"
                 y="0"
-                width="232"
+                width="268"
                 height="54"
                 rx="7"
                 fill="var(--scene-surface)"
@@ -389,7 +395,7 @@ const ROW_W = 320
               <text x="22" y="34" class="mono" font-size="19" fill="var(--scene-ink)">
                 {chip.ref}
               </text>
-              <text x="244" y="34" class="figure" font-size="18" font-weight="500" text-anchor="end" fill="var(--scene-muted)">
+              <text x="248" y="34" class="mono" font-size="17" text-anchor="end" fill="var(--scene-muted)">
                 {chip.amt}
               </text>
             </g>
@@ -402,7 +408,17 @@ const ROW_W = 320
     <div class="relative z-10 flex flex-1 items-center pt-[4.5rem]">
       <div class="shell w-full">
         <div data-copy class="max-w-2xl">
-          <p class="mono text-[0.68rem] tracking-[0.18em] uppercase" style="color: var(--scene-dim)">
+          {/* The hero's eyebrow, matching the `label` role everywhere else: Geist rather than the
+              machine face, and carrying brand colour. It reads scene variables rather than theme
+              tokens because everything inside the stage does — see the header comment, point 2. */}
+          <span
+            class="mb-4 block h-[3px] w-[3.25rem] rounded-[2px]"
+            style="background-image: linear-gradient(90deg, var(--scene-brand), var(--scene-brand-mid) 55%, var(--scene-accent))"
+            aria-hidden="true"></span>
+          <p
+            class="text-xs font-semibold tracking-[0.08em] uppercase"
+            style="color: var(--scene-brand-mid)"
+          >
             Agentic accounting operations
           </p>
           <h1
