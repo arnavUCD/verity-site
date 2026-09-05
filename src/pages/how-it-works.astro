@@ -80,10 +80,10 @@ const types = [
   />
 
   {/* --------------------------------------------------------------- the two doors */}
-  <section class="section-y">
+  <section id="two-doors" class="section-y">
     <div class="shell">
       <div class="grid gap-10 md:grid-cols-2">
-        <div class="border-hairline bg-surface rounded-lg border p-8">
+        <div class="border-hairline bg-surface rounded-lg lift border p-8">
           <span class="chip chip-confirmed">primary</span>
           <h2 class="mt-5 text-2xl font-medium">The bank feed finds the work</h2>
           <p class="text-ink-muted mt-4 leading-relaxed">
@@ -92,7 +92,7 @@ const types = [
             it runs whether or not anyone signs in.
           </p>
         </div>
-        <div class="border-hairline bg-surface rounded-lg border p-8">
+        <div class="border-hairline bg-surface rounded-lg lift border p-8">
           <span class="chip chip-neutral">secondary</span>
           <h2 class="mt-5 text-2xl font-medium">A person asks, in plain language</h2>
           <p class="text-ink-muted mt-4 leading-relaxed">
@@ -106,7 +106,7 @@ const types = [
   </section>
 
   {/* ----------------------------------------------------------------- the six steps */}
-  <section class="rule-top section-y">
+  <section id="pipeline" class="rule-top section-y">
     <div class="shell">
       <p class="label">The pipeline</p>
       <h2 class="mt-4 max-w-3xl text-[clamp(1.8rem,3.2vw,2.6rem)] leading-[1.1] font-medium">
@@ -115,10 +115,13 @@ const types = [
 
       <ol class="mt-16 space-y-px">
         {
-          steps.map((step) => (
-            <li class="border-hairline reveal grid gap-6 border-t py-10 md:grid-cols-[7rem_1fr_1fr] md:gap-10">
+          steps.map((step, i) => (
+            <li
+              class="border-hairline reveal-i grid gap-6 border-t py-10 md:grid-cols-[7rem_1fr_1fr] md:gap-10"
+              style={`--i: ${i % 2}`}
+            >
               <div>
-                <p class="mono text-accent text-xs">{step.n}</p>
+                <p class="mono accent-resolve text-xs">{step.n}</p>
                 <h3 class="mt-2 text-xl font-medium">{step.name}</h3>
               </div>
               <div>
@@ -136,7 +139,7 @@ const types = [
   </section>
 
   {/* ------------------------------------------------------------ the matching floor */}
-  <section class="rule-top section-y">
+  <section id="matching-floor" class="rule-top section-y">
     <div class="shell">
       <div class="grid gap-14 lg:grid-cols-[1fr_1fr]">
         <div>
@@ -171,7 +174,7 @@ const types = [
         </div>
 
         <div>
-          <div class="border-hairline bg-surface rounded-lg border p-6 sm:p-8">
+          <div class="border-hairline bg-surface rounded-lg lift border p-6 sm:p-8">
             <p class="label">Classification</p>
             <ul class="mt-6 space-y-6">
               {
@@ -199,7 +202,7 @@ const types = [
   </section>
 
   {/* ---------------------------------------------------------------- the day, and next */}
-  <section class="rule-top section-y">
+  <section id="oversight" class="rule-top section-y">
     <div class="shell">
       <div class="grid gap-14 lg:grid-cols-[1.1fr_0.9fr]">
         <div>
@@ -225,7 +228,7 @@ const types = [
           </div>
         </div>
 
-        <div class="border-hairline bg-surface rounded-lg border p-8">
+        <div class="border-hairline bg-surface rounded-lg lift border p-8">
           <span class="chip chip-neutral">shipping next</span>
           <h3 class="mt-5 text-xl font-medium">
             Removing the approval step for bank-matched payments

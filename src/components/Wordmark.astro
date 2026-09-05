@@ -1,21 +1,42 @@
 ---
 /**
- * The product mark: the dome from the poster the app's hero is built on.
+ * The product mark: the dome from the poster (`Verity Logo.png`) the app's hero is built on.
  *
  * It replaces a placeholder equals sign, which stood for reconciliation — two records made to
  * agree — and was always holding the spot for a real mark. The dome is the one piece of that
  * artwork that survives being shrunk to 24px; the drawn wordmark above it turns to mush.
  *
- * Kept identical to the app's (frontend/src/app/Wordmark.tsx), down to the arc and the colour,
- * because a visitor crossing from this site into the product should not have to wonder whether
- * they are in the right place. Change one, change the other.
+ * TWO CORRECTIONS, 2026-09-05, both measured off the poster rather than eyeballed:
+ *
+ * 1. THE COLOUR WAS WRONG. This file previously claimed the mark was "sampled from the poster"
+ *    and drew it in `#2b2478` — a VIOLET (R>G). Every navy in the poster is a BLUE (G>R): the
+ *    drawn wordmark is `#0e2668`, the dome runs `#2f5082` at its lit rim to `#1e3872` at its
+ *    core. The mark had been quietly off-brand since it was drawn, behind a comment asserting
+ *    the opposite.
+ * 2. THE DOME IS A GRADIENT, NOT A FLAT FILL. Reading the poster at any size shows a lit upper
+ *    rim falling to a deep core. Flattening that to one colour is what made the old mark read as
+ *    a shape rather than as an object.
+ *
+ * KNOWN DESYNC: the app's `frontend/src/app/Wordmark.tsx` still draws the old violet flat fill.
+ * The rule below ("change one, change the other") is therefore CURRENTLY BROKEN, on purpose and
+ * on the user's direction — this session was scoped to the marketing site. Until the app follows,
+ * a visitor crossing the handoff sees two different blues. Tracked in the site README.
  */
 interface Props {
   href?: string
   class?: string
+  /** `lg` in the header, where the mark is the page's first object; `md` everywhere else. */
+  size?: 'md' | 'lg'
 }
-const { href, class: className = '' } = Astro.props
+const { href, class: className = '', size = 'md' } = Astro.props
 const Tag = href ? 'a' : 'div'
+const dome = size === 'lg' ? 'size-7' : 'size-6'
+const label = size === 'lg' ? 'text-[1.28rem]' : 'text-[1.0625rem]'
+
+/** The mark renders more than once per page (header and footer), and two <linearGradient>s
+ *  sharing an id is invalid HTML — the second is ignored and only survives here by accident of
+ *  the two being identical. A per-instance id costs nothing and removes the accident. */
+const gid = `dome-${Math.random().toString(36).slice(2, 8)}`
 ---
 
 <Tag
@@ -25,16 +46,49 @@ const Tag = href ? 'a' : 'div'
   aria-label="Verity — home"
 >
   <!-- No enclosing square: the dome is a shape rather than a glyph, and boxing it made a
-       dome-in-a-box, which is not what the poster does. The hover cue moved to the fill. -->
-  <span class="grid size-6 shrink-0 place-items-center">
-    <svg
-      viewBox="0 0 16 16"
-      class="text-indigo group-hover:text-accent size-6 transition-colors duration-300"
-      aria-hidden="true"
-    >
+       dome-in-a-box, which is not what the poster does. The hover cue lives in the fill. -->
+  <span class:list={['grid shrink-0 place-items-center', dome]}>
+    <svg viewBox="0 0 16 16" class:list={[dome]} aria-hidden="true">
+      <defs>
+        <!-- Diagonal, so the lit rim sits upper-left exactly as it does on the poster. -->
+        <linearGradient id={gid} x1="0" y1="0" x2="0.55" y2="1">
+          <stop offset="0%" class="dome-rim"></stop>
+          <stop offset="100%" class="dome-core"></stop>
+        </linearGradient>
+      </defs>
       <!-- One arc from (2,11) to (14,11) at r=6 is exactly a semicircle; `z` closes the flat. -->
-      <path d="M2 11a6 6 0 0 1 12 0z" fill="currentColor"></path>
+      <path d="M2 11a6 6 0 0 1 12 0z" fill={`url(#${gid})`}></path>
     </svg>
   </span>
-  <span class="text-[1.0625rem] font-medium tracking-[-0.03em]">Verity</span>
+  <span class:list={['text-brand font-medium tracking-[-0.03em]', label]}>Verity</span>
 </Tag>
+
+<style>
+  /* `stop-color` is an animatable CSS property, so the hover cue is a real transition on the
+     gradient rather than a swapped fill. The dome brightens toward the accent — it does not
+     change hue — because the mark is one object catching more light, not a different object. */
+  .dome-rim {
+    stop-color: var(--color-brand-mid);
+    transition: stop-color 0.45s ease;
+  }
+
+  .dome-core {
+    stop-color: var(--color-brand);
+    transition: stop-color 0.45s ease;
+  }
+
+  .group:hover .dome-rim {
+    stop-color: var(--color-accent-bright);
+  }
+
+  .group:hover .dome-core {
+    stop-color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dome-rim,
+    .dome-core {
+      transition: none;
+    }
+  }
+</style>

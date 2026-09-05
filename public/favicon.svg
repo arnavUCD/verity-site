@@ -1,6 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="6" fill="#fafaf9" />
-  <rect x="1" y="1" width="30" height="30" rx="5.5" fill="none" stroke="#d6d3ce" />
-  <rect x="8" y="12" width="16" height="2.6" rx="0.8" fill="#3730ff" />
-  <rect x="8" y="17.4" width="16" height="2.6" rx="0.8" fill="#3730ff" />
+  <!-- The dome, matching Wordmark.astro. It replaced an equals sign (reconciliation — two records
+       made to agree) that outlived the mark it stood in for.
+
+       Colours are MEASURED off the poster (`Verity Logo.png`), not approximated: paper #f2ebdb,
+       dome rim #2f5082 falling to core #0e2668. The gradient is the poster's, and it is what makes
+       the dome read as an object rather than a shape.
+
+       The cream plate is the poster's paper, not the site's canvas (#fafaf9), and that is
+       deliberate: this tile is the MARK, which is brand-true, rather than a swatch of the page.
+       It also makes the tab recognisable in a strip of white favicons.
+
+       The plate and its hairline are the one place this mark is boxed — a browser tab is not the
+       page. Navy on a dark tab bar is close to invisible, so the dome needs a light ground; cream
+       on a white tab bar is close to invisible in turn, so that ground needs an edge. In the page,
+       where neither problem exists, the mark is unboxed — see the note in Wordmark.astro.
+
+       Geometry is the wordmark's, scaled: one arc at r=9 from (7,21) to (25,21) is exactly a
+       semicircle, `z` closes the flat. Centred a half-unit low, because a dome carries its weight
+       at the base and sitting it on the true centre reads high. -->
+  <defs>
+    <linearGradient id="dome" x1="0" y1="0" x2="0.55" y2="1">
+      <stop offset="0%" stop-color="#2f5082" />
+      <stop offset="100%" stop-color="#0e2668" />
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="6" fill="#f2ebdb" />
+  <rect x="1" y="1" width="30" height="30" rx="5.5" fill="none" stroke="#ddd4bd" />
+  <path d="M7 21a9 9 0 0 1 18 0z" fill="url(#dome)" />
 </svg>

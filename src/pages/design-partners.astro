@@ -73,7 +73,7 @@ const notFit = [
   />
 
   {/* ------------------------------------------------------------------- the trade */}
-  <section class="section-y">
+  <section id="the-trade" class="section-y">
     <div class="shell">
       <div class="grid gap-14 lg:grid-cols-2">
         <div>
@@ -83,8 +83,8 @@ const notFit = [
           </h2>
           <ul class="mt-10 space-y-8">
             {
-              youGet.map((item) => (
-                <li class="border-hairline reveal border-t pt-6">
+              youGet.map((item, i) => (
+                <li class="border-hairline reveal-i border-t pt-6" style={`--i: ${i}`}>
                   <h3 class="text-lg font-medium">{item.title}</h3>
                   <p class="text-ink-muted mt-3 leading-relaxed">{item.body}</p>
                 </li>
@@ -100,8 +100,8 @@ const notFit = [
           </h2>
           <ul class="mt-10 space-y-8">
             {
-              weAsk.map((item) => (
-                <li class="border-hairline reveal border-t pt-6">
+              weAsk.map((item, i) => (
+                <li class="border-hairline reveal-i border-t pt-6" style={`--i: ${i}`}>
                   <h3 class="text-lg font-medium">{item.title}</h3>
                   <p class="text-ink-muted mt-3 leading-relaxed">{item.body}</p>
                 </li>
@@ -122,7 +122,7 @@ const notFit = [
   </section>
 
   {/* ---------------------------------------------------------------------- the fit */}
-  <section class="rule-top section-y">
+  <section id="fit" class="rule-top section-y">
     <div class="shell">
       <p class="label">Fit</p>
       <h2 class="mt-4 max-w-3xl text-[clamp(1.8rem,3.2vw,2.6rem)] leading-[1.1] font-medium">
@@ -165,7 +165,7 @@ const notFit = [
   </section>
 
   {/* --------------------------------------------------------------------- how to start */}
-  <section class="rule-top section-y">
+  <section id="how-it-starts" class="rule-top section-y">
     <div class="shell">
       <div class="max-w-3xl">
         <p class="label">How it starts</p>
@@ -188,8 +188,8 @@ const notFit = [
                 b: 'Bank via Plaid, billing via your provider’s consent screen. Read-only first: you can watch it classify for as long as you like before anything is ever posted back.',
               },
             ].map((s, i) => (
-              <li class="border-hairline flex gap-8 border-t pt-6">
-                <span class="mono text-accent text-xs">{String(i + 1).padStart(2, '0')}</span>
+              <li class="border-hairline reveal-i flex gap-8 border-t pt-6" style={`--i: ${i}`}>
+                <span class="mono accent-resolve text-xs">{String(i + 1).padStart(2, '0')}</span>
                 <div>
                   <h3 class="text-xl font-medium">{s.t}</h3>
                   <p class="text-ink-muted mt-3 max-w-xl leading-relaxed">{s.b}</p>

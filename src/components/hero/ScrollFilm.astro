@@ -78,10 +78,11 @@ const LEDGER_X = 3560
 const ROW_W = 320
 ---
 
-{/* -mt-16 pulls the stage up UNDER the sticky header, so the film is genuinely full-bleed and the
-    header floats on it (transparent while the phase is dark). The copy adds the height back as
-    padding so it never sits beneath the nav. */}
-<section data-film class="relative -mt-16">
+{/* The negative margin pulls the stage up UNDER the sticky header, so the film is genuinely
+    full-bleed and the header floats on it. The copy adds the same height back as padding so it
+    never sits beneath the nav. BOTH must track the header's height — it is 4.5rem in
+    SiteHeader.astro, and if these two drift the hero copy slides under the bar. */}
+<section data-film class="relative -mt-[4.5rem]">
   <div data-stage class="relative flex h-svh flex-col overflow-hidden">
     {/* preserveAspectRatio is xMIN, not xMid: the scene is nearly three viewports wide and the
         camera pans it, so it must be anchored to its LEFT edge. Centring it starts the film
@@ -100,6 +101,15 @@ const ROW_W = 320
           <stop offset="0%" stop-color="var(--scene-accent)" stop-opacity="0"></stop>
           <stop offset="50%" stop-color="var(--scene-accent)" stop-opacity="0.55"></stop>
           <stop offset="100%" stop-color="var(--scene-accent)" stop-opacity="0"></stop>
+        </linearGradient>
+        {/* The rail warms along its length: neutral where raw transactions arrive, brand blue
+            through the working stations, accent as it reaches the books. Decorative only —
+            `--scene-brand*` are the mark's colours and never state vocabulary. */}
+        <linearGradient id="rail-g" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="var(--scene-line)"></stop>
+          <stop offset="28%" stop-color="var(--scene-brand-mid)" stop-opacity="0.55"></stop>
+          <stop offset="72%" stop-color="var(--scene-brand)" stop-opacity="0.7"></stop>
+          <stop offset="100%" stop-color="var(--scene-accent)" stop-opacity="0.85"></stop>
         </linearGradient>
         <linearGradient id="feed-fade-g" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stop-color="#fff" stop-opacity="1"></stop>
@@ -137,11 +147,15 @@ const ROW_W = 320
                   >
                     {line.desc}
                   </text>
+                  {/* The AMOUNT is a `figure`, not a `mono` — set in the text face, still on
+                      tabular numerals so the column stays straight. The narration beside it stays
+                      mono, because that is the machine artefact act one is arguing about. */}
                   <text
                     x="1404"
                     y={y}
-                    class="mono"
-                    font-size="14.5"
+                    class="figure"
+                    font-size="15"
+                    font-weight="500"
                     text-anchor="end"
                     fill={line.tick ? 'var(--scene-ink)' : 'var(--scene-dim)'}
                   >
@@ -159,13 +173,28 @@ const ROW_W = 320
           y={RAIL_Y}
           width="2850"
           height="2"
-          fill="var(--scene-line)"
+          fill="url(#rail-g)"
           data-rail></rect>
 
         {
           STATIONS.map((s, i) => (
             <g data-station={i}>
               <rect x={s.x - 1} y={RAIL_Y - 26} width="2" height="52" fill="var(--scene-line)" />
+
+              {/* THE LIT STATE IS A SECOND, BRAND-COLOURED COPY AT opacity 0 — not a colour tween.
+                  Point 2 of this file's header comment is that colour is read from the stylesheet
+                  and NEVER tweened, and that rule is why the film has no seams. Fading a stacked
+                  copy in and out gets the same "this station is live" reading while leaving every
+                  colour a static value the stylesheet owns. */}
+              <rect
+                x={s.x - 1.5}
+                y={RAIL_Y - 30}
+                width="3"
+                height="60"
+                fill="var(--scene-brand-mid)"
+                opacity="0"
+                data-station-tick={i}
+              />
               <text
                 x={s.x}
                 y={RAIL_Y + 78}
@@ -175,6 +204,19 @@ const ROW_W = 320
                 text-anchor="middle"
                 fill="var(--scene-dim)"
                 data-station-label={i}
+              >
+                {s.label.toUpperCase()}
+              </text>
+              <text
+                x={s.x}
+                y={RAIL_Y + 78}
+                class="mono"
+                font-size="18"
+                letter-spacing="3"
+                text-anchor="middle"
+                fill="var(--scene-brand)"
+                opacity="0"
+                data-station-lit={i}
               >
                 {s.label.toUpperCase()}
               </text>
@@ -347,7 +389,7 @@ const ROW_W = 320
               <text x="22" y="34" class="mono" font-size="19" fill="var(--scene-ink)">
                 {chip.ref}
               </text>
-              <text x="244" y="34" class="mono" font-size="17" text-anchor="end" fill="var(--scene-dim)">
+              <text x="244" y="34" class="figure" font-size="18" font-weight="500" text-anchor="end" fill="var(--scene-muted)">
                 {chip.amt}
               </text>
             </g>
@@ -357,7 +399,7 @@ const ROW_W = 320
     </svg>
 
     {/* ------------------------------------------------------------------ copy */}
-    <div class="relative z-10 flex flex-1 items-center pt-16">
+    <div class="relative z-10 flex flex-1 items-center pt-[4.5rem]">
       <div class="shell w-full">
         <div data-copy class="max-w-2xl">
           <p class="mono text-[0.68rem] tracking-[0.18em] uppercase" style="color: var(--scene-dim)">
@@ -437,7 +479,10 @@ const ROW_W = 320
     gsap.set('[data-stage-caption]', { opacity: 0 })
     gsap.set('[data-conn]', { attr: { 'stroke-dashoffset': 1 } })
     gsap.set('[data-row-fill]', { attr: { width: 0 } })
-    gsap.set(['[data-tag]', '[data-tray-item]', '[data-beam]'], { opacity: 0 })
+    gsap.set(
+      ['[data-tag]', '[data-tray-item]', '[data-beam]', '[data-station-lit]', '[data-station-tick]'],
+      { opacity: 0 },
+    )
   }
 
   /** Tears the film down if one is running. Restoring the static hero is `showStatic`'s job, so
@@ -508,7 +553,8 @@ const ROW_W = 320
     tl.to('[data-narr]', { opacity: 0.22, duration: 1, stagger: { amount: 0.8 } }, 1.0)
     tl.to('[data-chip]', { opacity: 1, duration: 0.6, stagger: 0.18 }, 1.3)
 
-    /** A caption owns the frame only while its station does. */
+    /** A caption owns the frame only while its station does — and the station lights with it, so
+     *  the colour and the words arrive as one event rather than two. */
     const caption = (i: number, at: number, until: number) => {
       tl.fromTo(
         `[data-stage-caption="${i}"]`,
@@ -517,6 +563,17 @@ const ROW_W = 320
         at,
       )
       tl.to(`[data-stage-caption="${i}"]`, { opacity: 0, y: -14, duration: 0.6 }, until)
+
+      // The lit label crossfades over the dim one; the tick grows from the rail rather than
+      // appearing. Both are opacity/scale only — no colour is tweened (header comment, point 2).
+      tl.to(`[data-station-lit="${i}"]`, { opacity: 1, duration: 0.5 }, at)
+      tl.fromTo(
+        `[data-station-tick="${i}"]`,
+        { opacity: 0, scaleY: 0.2, transformOrigin: 'center' },
+        { opacity: 1, scaleY: 1, duration: 0.6 },
+        at,
+      )
+      tl.to([`[data-station-lit="${i}"]`, `[data-station-tick="${i}"]`], { opacity: 0, duration: 0.5 }, until)
     }
 
     // The payments travel the rail while the camera travels with them — slightly slower, so they

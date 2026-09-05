@@ -120,10 +120,10 @@ const connectors = [
 
       <ol class="mt-14 grid gap-x-12 gap-y-10 md:grid-cols-2 lg:grid-cols-3">
         {
-          pipeline.map((step) => (
-            <li class="reveal">
-              <div class="bg-hairline rule-draw h-px w-full" />
-              <p class="mono text-accent mt-5 text-xs">{step.n}</p>
+          pipeline.map((step, i) => (
+            <li class="reveal-i" style={`--i: ${i % 3}`}>
+              <div class="rule-brand h-px w-full" />
+              <p class="mono accent-resolve mt-5 text-xs">{step.n}</p>
               <h3 class="mt-2 text-xl font-medium">{step.title}</h3>
               <p class="text-ink-muted mt-2.5 leading-relaxed">{step.body}</p>
             </li>
@@ -160,7 +160,7 @@ const connectors = [
           </div>
         </div>
 
-        <div class="border-hairline bg-surface rounded-lg border p-6 sm:p-8">
+        <div class="border-hairline bg-surface rounded-lg lift border p-6 sm:p-8">
           <p class="label">Classification</p>
           <ul class="mt-6 space-y-6">
             {
@@ -207,7 +207,7 @@ const connectors = [
           </div>
         </div>
 
-        <div class="border-hairline bg-surface rounded-lg border p-6 sm:p-8">
+        <div class="border-hairline bg-surface rounded-lg lift border p-6 sm:p-8">
           <p class="label">Shipping next</p>
           <p class="mt-4 leading-relaxed">
             Removing the approval step for bank-matched payments. Where attribution is confirmed, the
@@ -243,8 +243,11 @@ const connectors = [
 
       <ul class="mt-12 grid gap-px overflow-hidden sm:grid-cols-2 lg:grid-cols-3">
         {
-          connectors.map((c) => (
-            <li class="border-hairline bg-surface -mt-px -ml-px border p-6">
+          connectors.map((c, i) => (
+            <li
+              class="border-hairline bg-surface reveal-i lift -mt-px -ml-px border p-6"
+              style={`--i: ${i % 3}`}
+            >
               <div class="flex items-center justify-between gap-4">
                 <h3 class="font-medium">{c.name}</h3>
                 <span
@@ -280,7 +283,7 @@ const connectors = [
           </p>
         </div>
 
-        <div class="border-hairline bg-surface rounded-lg border p-8">
+        <div class="border-hairline bg-surface rounded-lg lift border p-8">
           <p class="label">Design partners</p>
           <p class="mt-4 text-lg leading-relaxed">
             We’re pre-launch and onboarding design partners now.

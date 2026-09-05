@@ -4,9 +4,21 @@
  * rule and from alignment (ADR 0012 §2), so the header's job is to sit exactly on the grid and
  * get out of the way.
  *
- * The mobile menu is a native <details> disclosure, not an island — the nav is the one component
- * that MUST work before any script does, and a hydration failure that strands a visitor with no
- * way to navigate is worse than any polish it would buy.
+ * Each nav item opens a dropdown listing the SECTIONS of its page (`NAV` in consts.ts). The
+ * reason is not decoration: the interior pages are long, single-column arguments, and without
+ * this the only way into the middle of one is to land at the top and scroll looking for it. The
+ * dropdown makes a page's contents legible before you commit to it.
+ *
+ * IT IS PURE CSS — no island, no script, not one byte of JS. The panel is shown by `group-hover`
+ * for a mouse and by `group-focus-within` for a keyboard, and the two are not interchangeable:
+ * hover alone would build a menu a keyboard user cannot open, which is the standard way this
+ * component is got wrong. The panel is `invisible` rather than merely transparent precisely so
+ * that its links leave the tab order while it is closed — an opacity-0 panel is still focusable,
+ * and tabbing then walks through eighteen links nobody can see.
+ *
+ * The mobile menu remains a native <details> disclosure, for the reason it always was: the nav is
+ * the one component that MUST work before any script does, and a hydration failure that strands a
+ * visitor with no way to navigate is worse than any polish it would buy.
  */
 import CtaButton from '@/components/CtaButton.astro'
 import Wordmark from '@/components/Wordmark.astro'
@@ -24,41 +36,100 @@ const isActive = (href: string) => {
 
 <header
   data-site-header
-  class="border-hairline bg-canvas/85 sticky top-0 z-40 border-b backdrop-blur-md supports-[backdrop-filter]:bg-canvas/70"
+  class="border-hairline bg-canvas/85 supports-[backdrop-filter]:bg-canvas/70 sticky top-0 z-40 border-b backdrop-blur-md"
 >
   <div class="shell">
-    <div class="flex h-16 items-center justify-between gap-6">
-      <Wordmark href={url("/")} />
+    <div class="flex h-[4.5rem] items-center justify-between gap-6">
+      <Wordmark href={url("/")} size="lg" />
 
-      <nav class="hidden items-center gap-7 md:flex" aria-label="Primary">
+      <nav class="hidden items-center gap-0.5 lg:flex" aria-label="Primary">
         {
           NAV.map((item) => (
-            <a
-              href={url(item.href)}
-              data-nav-link
-              aria-current={isActive(item.href) ? 'page' : undefined}
-              class:list={[
-                'relative py-1 text-sm transition-colors duration-200',
-                isActive(item.href) ? 'text-ink' : 'text-ink-muted hover:text-ink',
-              ]}
-            >
-              {item.label}
-              {isActive(item.href) && (
-                <span class="bg-accent absolute -bottom-[1.35rem] left-0 h-px w-full" />
-              )}
-            </a>
+            <div class="group relative">
+              <a
+                href={url(item.href)}
+                data-nav-link
+                aria-current={isActive(item.href) ? 'page' : undefined}
+                class:list={[
+                  'rounded-sm relative inline-flex items-center gap-1.5 px-3 py-2 text-[0.9375rem] font-medium transition-colors duration-200',
+                  isActive(item.href) ? 'text-ink' : 'text-ink-muted hover:text-ink',
+                ]}
+              >
+                {item.label}
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="text-ink-subtle size-3 transition-transform duration-300 group-hover:rotate-180 group-focus-within:rotate-180"
+                  aria-hidden="true"
+                >
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+                {isActive(item.href) && (
+                  <span class="bg-accent absolute -bottom-[1.05rem] left-3 h-px w-[calc(100%-1.5rem)]" />
+                )}
+              </a>
+
+              {/* `pt-3` is the hover bridge as well as the gap: the panel starts at the bar's
+                  bottom edge so the pointer never crosses dead space on its way down. A visual
+                  gap made of margin would close the menu halfway to it. */}
+              <div class="invisible absolute top-full left-1/2 z-50 w-[27rem] -translate-x-1/2 pt-3 opacity-0 transition-[opacity,transform] duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 -translate-y-1">
+                <div class="border-hairline bg-surface rounded-lg border p-2 shadow-[0_12px_40px_-12px_rgba(11,11,12,0.18)]">
+                  <ul>
+                    {item.sections.map((s) => (
+                      <li>
+                        <a
+                          href={url(s.href)}
+                          class="rounded-md hover:bg-accent-wash group/row block px-3 py-2.5 transition-colors duration-150"
+                        >
+                          <span class="group-hover/row:text-accent block text-sm font-medium transition-colors duration-150">
+                            {s.label}
+                          </span>
+                          <span class="text-ink-muted mt-0.5 block text-[0.8125rem] leading-snug">
+                            {s.desc}
+                          </span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                  <div class="border-hairline mt-1 border-t px-3 pt-2.5 pb-1">
+                    <a
+                      href={url(item.href)}
+                      class="text-ink-subtle hover:text-accent mono inline-flex items-center gap-1.5 text-[0.6875rem] tracking-[0.14em] uppercase transition-colors"
+                    >
+                      Read the whole page
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="size-3"
+                        aria-hidden="true"
+                      >
+                        <path d="M5 12h14M13 6l6 6-6 6" />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
           ))
         }
       </nav>
 
       <div class="flex items-center gap-2">
         <CtaButton
-          class="bg-ink text-canvas rounded-sm hover:bg-accent hidden px-4 py-2 text-sm font-medium transition-colors duration-200 sm:inline-flex"
+          class="bg-ink text-canvas rounded-sm hover:bg-accent hidden px-5 py-2.5 text-[0.9375rem] font-medium transition-colors duration-200 sm:inline-flex"
         />
 
-        <details class="group relative md:hidden">
+        <details class="group relative lg:hidden">
           <summary
-            class="border-hairline-strong rounded-sm grid size-9 cursor-pointer place-items-center border [&::-webkit-details-marker]:hidden"
+            class="border-hairline-strong rounded-sm grid size-10 cursor-pointer place-items-center border [&::-webkit-details-marker]:hidden"
             aria-label="Menu"
           >
             <svg
@@ -67,7 +138,7 @@ const isActive = (href: string) => {
               stroke="currentColor"
               stroke-width="1.5"
               stroke-linecap="round"
-              class="size-4.5"
+              class="size-5"
               aria-hidden="true"
             >
               <path d="M4 8h16M4 16h16"></path>
@@ -75,24 +146,38 @@ const isActive = (href: string) => {
           </summary>
 
           <nav
-            class="border-hairline bg-surface rounded-md absolute right-0 mt-3 flex w-60 flex-col border p-2 shadow-[0_12px_40px_-12px_rgba(11,11,12,0.18)]"
+            class="border-hairline bg-surface rounded-md absolute right-0 mt-3 flex max-h-[70svh] w-[19rem] flex-col overflow-y-auto border p-2 shadow-[0_12px_40px_-12px_rgba(11,11,12,0.18)]"
             aria-label="Primary, mobile"
           >
             {
               NAV.map((item) => (
-                <a
-                  href={url(item.href)}
-                  aria-current={isActive(item.href) ? 'page' : undefined}
-                  class:list={[
-                    'rounded-xs px-3 py-2.5 text-sm',
-                    isActive(item.href) ? 'text-ink bg-accent-wash' : 'text-ink-muted',
-                  ]}
-                >
-                  {item.label}
-                </a>
+                <div class="border-hairline border-b py-1 last:border-0">
+                  <a
+                    href={url(item.href)}
+                    aria-current={isActive(item.href) ? 'page' : undefined}
+                    class:list={[
+                      'rounded-xs block px-3 py-2 text-[0.9375rem] font-medium',
+                      isActive(item.href) ? 'text-ink bg-accent-wash' : 'text-ink',
+                    ]}
+                  >
+                    {item.label}
+                  </a>
+                  <ul class="pb-1">
+                    {item.sections.map((s) => (
+                      <li>
+                        <a
+                          href={url(s.href)}
+                          class="text-ink-muted rounded-xs block px-3 py-1.5 text-[0.8125rem]"
+                        >
+                          {s.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               ))
             }
-            <CtaButton class="bg-ink text-canvas rounded-xs mt-1 block px-3 py-2.5 text-sm font-medium" />
+            <CtaButton class="bg-ink text-canvas rounded-xs mt-2 block px-3 py-2.5 text-center text-sm font-medium" />
           </nav>
         </details>
       </div>

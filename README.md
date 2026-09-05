@@ -21,7 +21,7 @@ npm run build     # astro check + static build to dist/
 npm run preview
 ```
 
-## Four rules that are easy to break by accident
+## Six rules that are easy to break by accident
 
 1. **Every claim traces to code.** No customer logos, testimonials, review scores, compliance
    badges, or invented metrics — we have none of those yet, and a finance buyer checks. The
@@ -43,18 +43,34 @@ npm run preview
    leaves four blank screens to scroll past.
 5. **No React, and no WebGL.** The film is SVG + a GSAP timeline. Nothing on the site needs a
    component runtime; adding one back needs a reason recorded in an ADR.
+6. **An animation may never be the only source of a finished style** (ADR 0012 §12.4). This is the
+   quieter half of rule 3, and it has already shipped here once: a `view()` timeline is *inactive*
+   whenever its subject is not mid-entry — a page loaded already scrolled, a jump to a `#section`
+   anchor — and an inactive animation applies **nothing**, dropping the element to its base style.
+   `accent-resolve` put the colour only in its keyframes, and six pipeline numbers rendered
+   near-black. The base style must already be the finished style; the animation only supplies the
+   arrival. Neither this nor the `animation-range` bug was visible to `astro check` — both were
+   found by reading computed style in a browser, which is the check that catches the class.
 
 ## Structure
 
 ```
 src/
-  components/       SiteHeader, SiteFooter, Wordmark
+  components/       SiteHeader (nav + section dropdowns), SiteFooter, Wordmark,
+                    CtaButton, CTASection, PageHero
     hero/           ScrollFilm — the pinned, scroll-scrubbed SVG film
   layouts/          BaseLayout — all head/meta discipline lives here
-  pages/            index.astro
+  pages/            index + the five interior pages, privacy, terms
   styles/global.css the whole design system: tokens, primitives, motion
   consts.ts         domain, app URL, contact, nav — a domain change is a one-file edit
+scripts/
+  check-anchors.mjs asserts every header dropdown link resolves in the BUILT html
 ```
+
+The header's dropdowns are **pure CSS** (`group-hover` for a pointer, `group-focus-within` for a
+keyboard) and add zero JS. Their targets come from `NAV` in `consts.ts`, and every `#id` in it is
+verified against `dist/` by `check-anchors`, which runs as part of `npm run build` — a dropdown
+that scrolls nowhere is the kind of breakage nothing else in the pipeline would notice.
 
 ## Deploying to GitHub Pages
 
@@ -105,9 +121,13 @@ Three things that make a Pages deploy fail silently, all handled here:
 
 - `SITE_URL`, `APP_URL` and `CONTACT_EMAIL` in [`src/consts.ts`](src/consts.ts) are placeholders.
 - The CTA lands on an app that still calls itself **EOS** (ADR 0011 §7).
+- The dome is now the poster's navy gradient here, while the app's
+  `frontend/src/app/Wordmark.tsx` still draws the old violet flat fill — so the "change one, change
+  the other" rule the two files share is **currently broken on purpose** (ADR 0012 §12.1). A visitor
+  crossing the CTA handoff sees two different blues until the app follows.
+- The site canvas stays cool `#fafaf9` while the poster and the operator UI are both on cream
+  (ADR 0012 §12.2). Deferred, not overlooked: a new ground re-rates every contrast figure measured
+  against it.
 - `/privacy` and `/terms` are **not legally reviewed**. They are accurate about what the site does
   and say plainly that the product's binding terms live in the design-partner agreement. Both are
   `noindex` and excluded from the sitemap until counsel has been through them.
-- The hero film shows **US payment rails** (ACH, wire, check, Zelle) while the narrative document
-  states an India-first ICP. One of the two has to move; it is a positioning decision, not a design
-  one.

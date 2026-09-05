@@ -47,11 +47,22 @@
 
   --color-accent: #175ba6; /* 6.5:1 on canvas — navy blue, text/buttons/links/focus */
 
-  /* The BRAND MARK's colour, and only that. Sampled from the poster the app's hero is built on,
-     so the dome reads as the same object on both sides of the handoff — a visitor arriving here
-     from the app should not have to wonder. Deliberately NOT part of the state vocabulary (rule
-     2 in the banner): it never means anything, it is just what the mark is made of. */
-  --color-indigo: #2b2478;
+  /* The BRAND MARK's colours, and only those. MEASURED off the poster (`Verity Logo.png`), not
+     approximated — which is the correction they carry. The token these replace, `--indigo:
+     #2b2478`, claimed in its own comment to have been sampled from that poster and had not been:
+     #2b2478 is violet (R>G), and every navy in the poster is blue (G>R). The mark had been
+     quietly off-brand since it was drawn.
+       --brand      the drawn wordmark's ink, and the dome's deep core
+       --brand-mid  the dome's lit rim — the poster's dome is a GRADIENT, not a flat fill
+     Deliberately NOT state vocabulary (rule 2 in the banner): they never mean anything, they are
+     just what the mark is made of. `--brand-mid` is also the site's one DECORATIVE blue — it may
+     fill a gradient or draw a rule, and it is never a link colour; `--accent` stays that.
+
+     KNOWN DESYNC: `Wordmark.astro` says "change one, change the other" about the app's
+     `frontend/src/app/Wordmark.tsx`, which still draws the violet. Corrected here only, on the
+     user's direction — the app follows in its own change. */
+  --color-brand: #0e2668; /* 13.1:1 on canvas */
+  --color-brand-mid: #2f5082; /* 7.8:1 — passes for text, but reserved for decoration */
   --color-accent-wash: #eaf3ff; /* pale tint — selection highlight, chip fills (accent text sits on this) */
   --color-accent-bright: #78bbff; /* borders, dividers, decorative fills — no text ever sits on this alone */
 
@@ -130,6 +141,12 @@
   --scene-ok: #0a7f5f;
   --scene-warn: #b45309;
 
+  /* The mark's own blues, in the film. Decorative ONLY — they fill the rail gradient and warm the
+     station labels, and they never carry state. Keeping them out of the state pair is what stops
+     "the rail looks blue here" from ever reading as a classification. */
+  --scene-brand: #0e2668;
+  --scene-brand-mid: #2f5082;
+
   background: var(--scene-bg);
 }
 
@@ -172,6 +189,24 @@
 @utility mono {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
+}
+
+/* A FIGURE set in the TEXT face — the money amounts in the hero film, and nothing else yet.
+   A narrow, deliberate exception to ADR 0012 §3's semantic mono assignment, taken on the user's
+   direction: in the film the amounts sit directly beside display type, and Plex there read as a
+   different document rather than the same one.
+
+   `tabular-nums` is the part that must not be dropped. It is what holds an amount column straight,
+   and §3's side argument for mono was that it supplied tabular figures for free. Geist supplies
+   them too, so the column survives the swap — which is the only reason this exception is cheap.
+
+   The narration, refs and state names AROUND them stay mono. That split is the whole point: act
+   one's argument is that bank narration is a machine artefact you are forced to read, and setting
+   it in the text face would throw away the distinction the film exists to draw. */
+@utility figure {
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.012em;
 }
 
 /* The small mono label that sits above a heading. Used sparingly: it is the
@@ -272,6 +307,87 @@
   }
 }
 
+/* ---------------------------------------------------------------------------
+   Added for the content sections, which read as a wall of correct, static text.
+   Everything below is still native `view()` scroll-driven animation with
+   SINGLE-PHASE ranges, so it inherits the degradation story unchanged: where the
+   feature is missing the declaration is ignored and the element renders final.
+   No JS is added to any page by any of this.
+   --------------------------------------------------------------------------- */
+
+/* Staggered sibling reveal. Each item shifts BOTH endpoints of its range by its own `--i`, so a
+   row of cards resolves across rather than snapping in as one block. Both endpoints move by the
+   same amount, which is what keeps the range well-formed at every index — the failure documented
+   on `reveal` was a range whose endpoints moved independently and inverted. */
+@utility reveal-i {
+  animation: reveal-up linear both;
+  animation-timeline: view();
+  animation-range: entry calc(var(--i, 0) * 4%) entry calc(52% + var(--i, 0) * 4%);
+}
+
+/* A figure or label that arrives DIM and resolves to the accent as its section lands. This is the
+   "accent animation" in its safest possible form: both keyframes are legible colours, so there is
+   no frame of this animation in which the text cannot be read. Contrast that with fading opacity
+   from 0 — same gesture, but one endpoint is invisible, and §5 exists because of it.
+
+   THE `color` DECLARATION BELOW IS THE WHOLE POINT, and it was missing in the first cut of this
+   utility. A `view()` timeline is INACTIVE whenever its subject is not in an entry/exit phase —
+   which includes a page loaded already scrolled, a jump to a `#section` anchor, and a browser
+   with no scroll-driven animation at all. An inactive animation applies NOTHING, so the element
+   falls back to its base style. With no base colour here, six pipeline numbers that had been
+   accent blue silently rendered near-black inherited ink, and only when the animation happened
+   to be mid-range did they look right.
+
+   That is ADR 0012 §5's implementation rule ("content is visible by default, animation is an
+   enhancement on top") failing in its quieter form: not invisible content, but a FINAL STATE that
+   only exists while an animation is running. The base declaration and the `to` keyframe are the
+   same value on purpose — every path now ends accent blue, animated or not. */
+@utility accent-resolve {
+  color: var(--color-accent);
+  animation: accent-resolve linear both;
+  animation-timeline: view();
+  animation-range: entry 8% entry 58%;
+}
+
+@keyframes accent-resolve {
+  from {
+    color: var(--color-ink-subtle);
+  }
+  to {
+    color: var(--color-accent);
+  }
+}
+
+/* The structural hairline, drawn in the BRAND gradient instead of flat grey — the poster's dome
+   runs mid-blue to deep navy, and this is that gradient laid on its side. Decorative by
+   definition (`--brand-mid` is never a text colour), so it carries no meaning to lose. */
+@utility rule-brand {
+  background-image: linear-gradient(
+    90deg,
+    var(--color-brand) 0%,
+    var(--color-brand-mid) 42%,
+    var(--color-accent-bright) 100%
+  );
+  transform-origin: left;
+  animation: rule-draw linear both;
+  animation-timeline: view();
+  animation-range: entry 0% entry 45%;
+}
+
+/* Card hover. Depth still comes from the hairline and from alignment (ADR 0012 §2) — the lift is
+   two pixels and a border that warms to the brand blue, NOT a shadow. A shadow here would say
+   "soft", and the whole argument is precision. */
+@utility lift {
+  transition:
+    transform 0.4s cubic-bezier(0.2, 0.7, 0.3, 1),
+    border-color 0.4s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-brand-mid);
+  }
+}
+
 /* Every animation on this site is decorative by decision (ADR 0012 §5), so turning
    all of it off can never cost a visitor content. */
 @media (prefers-reduced-motion: reduce) {
@@ -284,9 +400,24 @@
   }
 
   .reveal,
-  .rule-draw {
+  .reveal-i,
+  .rule-draw,
+  .rule-brand,
+  .accent-resolve {
     animation: none !important;
     opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* `accent-resolve`'s `from` keyframe is ink-subtle, so killing the animation without also
+     naming the end colour would leave the figure permanently at the DIM end — the one case in
+     this file where stopping an animation changes what the reader sees rather than just how it
+     arrived. */
+  .accent-resolve {
+    color: var(--color-accent) !important;
+  }
+
+  .lift:hover {
     transform: none !important;
   }
 }

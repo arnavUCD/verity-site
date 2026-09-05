@@ -100,12 +100,12 @@ const tiers = [
     lede="A connector is listed as available only when it can carry you end to end. Everything else says exactly what is missing and why. We would rather show you this than a wall of logos that connect to nothing."
   />
 
-  <section class="section-y">
+  <section id="providers" class="section-y">
     <div class="shell">
       <ul class="space-y-px">
         {
-          providers.map((p) => (
-            <li class="border-hairline reveal border-t py-10">
+          providers.map((p, i) => (
+            <li class="border-hairline reveal-i border-t py-10" style={`--i: ${i % 2}`}>
               <div class="grid gap-6 lg:grid-cols-[minmax(0,18rem)_1fr] lg:gap-14">
                 <div>
                   <div class="flex items-center gap-3">
@@ -146,7 +146,7 @@ const tiers = [
   </section>
 
   {/* ------------------------------------------------------------------- the tiers */}
-  <section class="rule-top section-y">
+  <section id="tiers" class="rule-top section-y">
     <div class="shell">
       <div class="grid gap-12 lg:grid-cols-[0.9fr_1.1fr]">
         <div>
@@ -176,7 +176,7 @@ const tiers = [
   </section>
 
   {/* ------------------------------------------------------------ canonical invoice */}
-  <section class="rule-top section-y">
+  <section id="canonical-invoice" class="rule-top section-y">
     <div class="shell">
       <div class="grid gap-14 lg:grid-cols-[1fr_1fr]">
         <div>
@@ -197,7 +197,7 @@ const tiers = [
             </p>
           </div>
         </div>
-        <div class="border-hairline bg-surface rounded-lg border p-8">
+        <div class="border-hairline bg-surface rounded-lg lift border p-8">
           <p class="label">Two boundaries we hold</p>
           <ul class="mt-6 space-y-6">
             <li>

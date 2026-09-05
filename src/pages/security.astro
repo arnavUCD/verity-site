@@ -68,7 +68,7 @@ const credentials = [
   />
 
   {/* ------------------------------------------------------------- the guarantees */}
-  <section class="section-y">
+  <section id="guarantees" class="section-y">
     <div class="shell">
       <p class="label">What is enforced</p>
       <h2 class="mt-4 max-w-3xl text-[clamp(1.8rem,3.2vw,2.6rem)] leading-[1.1] font-medium">
@@ -76,8 +76,8 @@ const credentials = [
       </h2>
       <ul class="mt-14 grid gap-x-14 gap-y-10 md:grid-cols-2">
         {
-          guarantees.map((g) => (
-            <li class="border-hairline reveal border-t pt-8">
+          guarantees.map((g, i) => (
+            <li class="border-hairline reveal-i border-t pt-8" style={`--i: ${i % 2}`}>
               <h3 class="text-xl leading-snug font-medium">{g.title}</h3>
               <p class="text-ink-muted mt-4 leading-relaxed">{g.how}</p>
             </li>
@@ -88,7 +88,7 @@ const credentials = [
   </section>
 
   {/* ------------------------------------------------------------------ credentials */}
-  <section class="rule-top section-y">
+  <section id="credentials" class="rule-top section-y">
     <div class="shell">
       <div class="grid gap-14 lg:grid-cols-[0.9fr_1.1fr]">
         <div>
@@ -116,7 +116,7 @@ const credentials = [
   </section>
 
   {/* ------------------------------------------------------------------- this site */}
-  <section class="rule-top section-y">
+  <section id="this-site" class="rule-top section-y">
     <div class="shell">
       <div class="grid gap-14 lg:grid-cols-[1fr_1fr]">
         <div>
@@ -138,7 +138,7 @@ const credentials = [
           </div>
         </div>
 
-        <div class="border-hairline bg-surface rounded-lg border p-8">
+        <div class="border-hairline bg-surface rounded-lg lift border p-8">
           <span class="chip chip-exception">no certification</span>
           <h3 class="mt-5 text-xl font-medium">What we have not done</h3>
           <div class="text-ink-muted mt-4 space-y-4 leading-relaxed">
@@ -163,7 +163,7 @@ const credentials = [
   </section>
 
   {/* ----------------------------------------------------------------------- audit */}
-  <section class="rule-top section-y">
+  <section id="audit" class="rule-top section-y">
     <div class="shell">
       <div class="max-w-3xl">
         <p class="label">Audit</p>
