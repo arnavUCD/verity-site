@@ -11,6 +11,8 @@ import CtaButton from '@/components/CtaButton.astro'
 import ScrollFilm from '@/components/hero/ScrollFilm.astro'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import { CONTACT_EMAIL } from '@/consts'
+import { url } from '@/lib/url'
+import ResolveText from '@/components/ResolveText.astro'
 
 const pipeline = [
   {
@@ -45,13 +47,6 @@ const pipeline = [
   },
 ]
 
-const classifications = [
-  { type: 'normal_payment', means: 'Settles the invoice it names', does: 'Reconciled. No credit.', tone: 'confirmed' },
-  { type: 'duplicate', means: 'The invoice was already settled', does: 'Credit note for the full amount', tone: 'confirmed' },
-  { type: 'overpayment', means: 'More than the invoice was for', does: 'Credit note for the excess', tone: 'confirmed' },
-  { type: 'unmatchable', means: 'The evidence does not settle it', does: 'Routed to a person, with the reasoning', tone: 'exception' },
-]
-
 const connectors = [
   { name: 'Plaid', role: 'Bank feed', status: 'Available' },
   { name: 'Zoho Books', role: 'Billing system', status: 'Available' },
@@ -68,19 +63,6 @@ const connectors = [
       It carries its own h1, subhead and CTAs. */}
   <ScrollFilm />
 
-  {/* The connector strip sits immediately under the film, in the light, as the first thing the
-      resolved palette touches. */}
-  <div class="shell">
-    <div class="border-hairline text-ink-subtle flex flex-wrap gap-x-8 gap-y-2 border-b pb-6 text-xs">
-      <span class="mono">Plaid</span>
-      <span class="mono">Zoho Books</span>
-      <span class="mono">QuickBooks · in progress</span>
-      <span class="mono">Xero · in progress</span>
-      <span class="mono">Odoo · planned</span>
-      <span class="mono">TallyPrime · planned</span>
-    </div>
-  </div>
-
   {/* ------------------------------------------------------------- problem */}
   <section class="section-y">
     <div class="shell">
@@ -92,27 +74,20 @@ const connectors = [
             The work we take off your desk.
           </h2>
         </div>
-        <div class="reveal text-ink-muted max-w-2xl space-y-5 text-lg leading-relaxed">
-          <p>
-            A payment lands. Somebody — usually the most senior person who understands the customer —
-            opens the bank statement, then the accounting system, and starts matching.
-          </p>
-          <p>
-            The reference is missing or truncated. The amount is two invoices paid together, or a
-            part payment. It’s the second payment against an invoice settled last month, and nobody
-            will notice until the customer complains.
-          </p>
-          <p class="text-ink">
-            None of it is hard. All of it needs context. And it stays invisible until it compounds
-            into a slow close, an angry customer, or a number nobody can explain.
-          </p>
+        {/* The read-along: these three paragraphs ink themselves in as you scroll them. It goes
+            HERE, on the problem, because this is the passage a finance reader is meant to recognise
+            their own week in — and pacing it slows them down enough to. */}
+        <div class="max-w-2xl space-y-5 text-lg leading-relaxed">
+          <ResolveText text="A payment lands. Somebody — usually the most senior person who understands the customer — opens the bank statement, then the accounting system, and starts matching." />
+          <ResolveText text="The reference is missing or truncated. The amount is two invoices paid together, or a part payment. It’s the second payment against an invoice settled last month, and nobody will notice until the customer complains." />
+          <ResolveText class="font-medium" text="None of it is hard. All of it needs context. And it stays invisible until it compounds into a slow close, an angry customer, or a number nobody can explain." />
         </div>
       </div>
     </div>
   </section>
 
   {/* ------------------------------------------------------------ pipeline */}
-  <section class="rule-top section-y">
+  <section class="rule-top section-y field">
     <div class="shell">
       <span class="accent-bar mb-4" aria-hidden="true"></span>
           <p class="label">The pipeline</p>
@@ -163,31 +138,32 @@ const connectors = [
           </div>
         </div>
 
-        <div class="border-hairline bg-surface rounded-lg lift border p-6 sm:p-8">
+        <div class="border-hairline bg-surface rounded-lg lift self-start border p-6 sm:p-8">
           <span class="accent-bar mb-4" aria-hidden="true"></span>
-          <p class="label">Classification</p>
-          <ul class="mt-6 space-y-6">
-            {
-              classifications.map((c) => (
-                <li class="border-hairline grid gap-2 border-b pb-6 last:border-0 last:pb-0 sm:grid-cols-[auto_1fr] sm:gap-5">
-                  <span class:list={['chip', c.tone === 'confirmed' ? 'chip-confirmed' : 'chip-exception']}>
-                    {c.type}
-                  </span>
-                  <div>
-                    <p class="text-sm">{c.means}</p>
-                    <p class="text-ink-muted mt-1 text-sm">{c.does}</p>
-                  </div>
-                </li>
-              ))
-            }
-          </ul>
+          <p class="label">The floor, in one line</p>
+          <p class="mt-4 text-lg leading-relaxed">
+            A reference the payment itself carries, confirmed against the invoice it names.
+          </p>
+          <p class="text-ink-muted mt-4 leading-relaxed">
+            Everything that clears it is handled end to end. Everything that does not becomes an
+            exception, with the model’s reading attached as context — never as authority.
+          </p>
+          <a
+            href={url('/how-it-works#matching-floor')}
+            class="text-accent hover:text-brand mt-6 inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
+          >
+            The four classifications, in full
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </a>
         </div>
       </div>
     </div>
   </section>
 
   {/* ------------------------------------------------------------- the day */}
-  <section class="rule-top section-y">
+  <section class="rule-top section-y field-alt">
     <div class="shell">
       <div class="grid gap-14 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
@@ -203,11 +179,9 @@ const connectors = [
               evidence didn’t settle, waiting for you.
             </p>
             <p>
-              Because every action is stamped at write time with what kind of actor took it, Verity
-              can answer a question most finance tools cannot: what fraction of your money decisions
-              had no human in the loop. Automation is never recorded as a human approval, so “the
-              system did this automatically” is a defensible audit answer rather than an awkward
-              discovery.
+              Every action is stamped at write time with what kind of actor took it, so automation is
+              never recorded as a human approval — and Verity can say what fraction of your money
+              decisions had no human in the loop at all.
             </p>
           </div>
         </div>
@@ -219,13 +193,15 @@ const connectors = [
             Removing the approval step for bank-matched payments. Where attribution is confirmed, the
             pipeline classifies, credits and posts with no pre-write human gate.
           </p>
-          <p class="text-ink-muted mt-4 text-sm leading-relaxed">
-            The controls that make that safe stay exactly where they are: the matching floor,
-            idempotent writes, a recoverable posting queue, honest audit, and an exception route for
-            anything ambiguous. Discretionary credits — goodwill, negotiated adjustments — keep a
-            human decision, because there the evidence is a commercial judgement rather than a fact
-            about a payment.
-          </p>
+          <a
+            href={url('/how-it-works#oversight')}
+            class="text-accent hover:text-brand mt-5 inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
+          >
+            Why removing it is safe
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </a>
         </div>
       </div>
     </div>
@@ -275,7 +251,7 @@ const connectors = [
   </section>
 
   {/* --------------------------------------------------------------- close */}
-  <section class="rule-top section-y">
+  <section class="rule-top section-y field">
     <div class="shell">
       <div class="grid gap-12 lg:grid-cols-[1fr_1fr]">
         <div>

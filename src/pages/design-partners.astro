@@ -73,7 +73,7 @@ const notFit = [
   />
 
   {/* ------------------------------------------------------------------- the trade */}
-  <section id="the-trade" class="section-y">
+  <section id="the-trade" class="section-y field">
     <div class="shell">
       <div class="grid gap-14 lg:grid-cols-2">
         <div>
@@ -141,8 +141,8 @@ const notFit = [
           <p class="text-confirmed text-xs font-semibold tracking-[0.08em] uppercase">A strong fit</p>
           <ul class="mt-6 space-y-4">
             {
-              fit.map((f) => (
-                <li class="border-hairline flex gap-4 border-b pb-4 last:border-0">
+              fit.map((f, i) => (
+                <li class="border-hairline reveal-i flex gap-4 border-b pb-4 last:border-0" style={`--i: ${i}`}>
                   <span class="text-confirmed mt-1.5 size-1.5 shrink-0 rounded-full bg-current" />
                   <p class="leading-relaxed">{f}</p>
                 </li>
@@ -154,8 +154,8 @@ const notFit = [
           <p class="text-exception text-xs font-semibold tracking-[0.08em] uppercase">Not right now</p>
           <ul class="mt-6 space-y-4">
             {
-              notFit.map((f) => (
-                <li class="border-hairline flex gap-4 border-b pb-4 last:border-0">
+              notFit.map((f, i) => (
+                <li class="border-hairline reveal-i flex gap-4 border-b pb-4 last:border-0" style={`--i: ${i}`}>
                   <span class="text-exception mt-1.5 size-1.5 shrink-0 rounded-full bg-current" />
                   <p class="text-ink-muted leading-relaxed">{f}</p>
                 </li>
@@ -168,7 +168,7 @@ const notFit = [
   </section>
 
   {/* --------------------------------------------------------------------- how to start */}
-  <section id="how-it-starts" class="rule-top section-y">
+  <section id="how-it-starts" class="rule-top section-y field-alt">
     <div class="shell">
       <div class="max-w-3xl">
         <span class="accent-bar mb-4" aria-hidden="true"></span>

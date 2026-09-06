@@ -105,7 +105,10 @@ const tiers = [
       <ul class="space-y-px">
         {
           providers.map((p, i) => (
-            <li class="border-hairline reveal-i border-t py-10" style={`--i: ${i % 2}`}>
+            <li class="border-hairline reveal-i relative border-t py-10" style={`--i: ${i % 2}`}>
+              {/* The row's top rule, redrawn in brand colour as the row arrives. The grey border-t
+                  underneath is always there, so this only ever adds colour to a line that exists. */}
+              <span class="rule-brand absolute top-[-1px] left-0 h-px w-full" aria-hidden="true" />
               <div class="grid gap-6 lg:grid-cols-[minmax(0,18rem)_1fr] lg:gap-14">
                 <div>
                   <div class="flex items-center gap-3">
@@ -146,7 +149,7 @@ const tiers = [
   </section>
 
   {/* ------------------------------------------------------------------- the tiers */}
-  <section id="tiers" class="rule-top section-y">
+  <section id="tiers" class="rule-top section-y field">
     <div class="shell">
       <div class="grid gap-12 lg:grid-cols-[0.9fr_1.1fr]">
         <div>
@@ -177,7 +180,7 @@ const tiers = [
   </section>
 
   {/* ------------------------------------------------------------ canonical invoice */}
-  <section id="canonical-invoice" class="rule-top section-y">
+  <section id="canonical-invoice" class="rule-top section-y field-alt">
     <div class="shell">
       <div class="grid gap-14 lg:grid-cols-[1fr_1fr]">
         <div>

@@ -115,16 +115,36 @@ const cases: Case[] = [
     lede="None of these are hard problems. All of them need context, and all of them cost more the longer they sit. Each is written as it actually happens: the situation, what today looks like, and what changes."
   />
 
-  <section id="cases" class="section-y">
+  <section id="cases" class="section-y field">
     <div class="shell">
-      <ul class="space-y-px">
+      {/* A rail down the list, filling as you scroll it — the hero film's scrub gesture borrowed
+          for the page that is one long enumeration. The grey track is always drawn; only the
+          coloured fill on top of it is animated, so a browser with no scroll-driven animation gets
+          a complete rail rather than a missing one. Hidden below lg, where the indent would eat
+          the column width it needs. */}
+      <div class="relative lg:pl-12">
+        <div
+          class="bg-hairline absolute top-0 bottom-0 left-0 hidden w-px lg:block"
+          aria-hidden="true">
+        </div>
+        <div
+          class="rail-fill absolute top-0 bottom-0 left-0 hidden w-[2px] lg:block"
+          aria-hidden="true">
+        </div>
+
+        <ul class="space-y-px">
         {
           cases.map((c, i) => (
             <li
               id={c.id.toLowerCase()}
-              class="border-hairline reveal-i border-t py-12"
-              style={`--i: ${i % 2}`}
+              class="border-hairline reveal-i relative border-t py-12"
+              style="--i: 0"
             >
+              {/* The case's own marker on the rail. */}
+              <span
+                class="bg-canvas border-brand-mid absolute top-[-5px] left-[-3.4rem] hidden size-[9px] rounded-full border-2 lg:block"
+                aria-hidden="true">
+              </span>
               <div class="grid gap-8 lg:grid-cols-[minmax(0,20rem)_1fr] lg:gap-14">
                 <div>
                   <div class="flex items-center gap-3">
@@ -160,12 +180,13 @@ const cases: Case[] = [
             </li>
           ))
         }
-      </ul>
+        </ul>
+      </div>
     </div>
   </section>
 
   {/* --------------------------------------------------------- measure it yourself */}
-  <section id="business-case" class="rule-top section-y">
+  <section id="business-case" class="rule-top section-y field-alt">
     <div class="shell">
       <div class="grid gap-12 lg:grid-cols-[1fr_1fr]">
         <div>

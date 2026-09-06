@@ -9,6 +9,7 @@
 import CTASection from '@/components/CTASection.astro'
 import PageHero from '@/components/PageHero.astro'
 import BaseLayout from '@/layouts/BaseLayout.astro'
+import ResolveText from '@/components/ResolveText.astro'
 
 const guarantees = [
   {
@@ -68,7 +69,7 @@ const credentials = [
   />
 
   {/* ------------------------------------------------------------- the guarantees */}
-  <section id="guarantees" class="section-y">
+  <section id="guarantees" class="section-y field">
     <div class="shell">
       <span class="accent-bar mb-4" aria-hidden="true"></span>
           <p class="label">What is enforced</p>
@@ -118,7 +119,7 @@ const credentials = [
   </section>
 
   {/* ------------------------------------------------------------------- this site */}
-  <section id="this-site" class="rule-top section-y">
+  <section id="this-site" class="rule-top section-y field-alt">
     <div class="shell">
       <div class="grid gap-14 lg:grid-cols-[1fr_1fr]">
         <div>
@@ -128,11 +129,7 @@ const credentials = [
             Collects nothing, so it can leak nothing.
           </h2>
           <div class="text-ink-muted mt-7 space-y-5 text-lg leading-relaxed">
-            <p>
-              There is no form on this site, no analytics, no tracking pixel, no chat widget, and no
-              cookie banner — because there is nothing to consent to. Fonts are self-hosted, so your
-              browser makes no third-party request while reading this page.
-            </p>
+            <ResolveText text="There is no form on this site, no analytics, no tracking pixel, no chat widget, and no cookie banner — because there is nothing to consent to. Fonts are self-hosted, so your browser makes no third-party request while reading this page." />
             <p>
               The only routes out are a link to the product demo and an email address. That is a
               deliberate constraint rather than a stage we have not got to yet: a marketing site

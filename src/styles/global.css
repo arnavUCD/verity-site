@@ -405,6 +405,91 @@
   animation-range: entry 0% entry 40%;
 }
 
+/* Text that resolves from subtle grey to full ink as you read down it — the scroll-linked
+   read-along. Applied per WORD (see ResolveText.astro), each word offsetting both ends of its own
+   range by `--i`, so the darkening travels across the line at reading speed.
+
+   THE RANGE IS `cover`, NOT `entry`, AND BOTH ENDS ARE IN IT. `entry` lasts only as long as the
+   element is crossing the viewport edge — for a paragraph that is a few hundred pixels, far too
+   short to read along with. `cover` spans the whole time the element is anywhere in view, which is
+   the duration this effect wants. Mixing the two is the documented way to invert a range (see
+   `reveal`); staying inside one phase is well-formed at every index.
+
+   The base colour is the FINISHED colour, per §12.4 — an inactive timeline leaves the text fully
+   inked rather than permanently grey. This animation can only ever darken text that is already
+   readable. */
+@utility text-resolve {
+  color: var(--color-ink);
+  animation: text-resolve linear both;
+  animation-timeline: view();
+  animation-range: cover calc(14% + var(--i, 0) * var(--step, 0.75%)) cover
+    calc(38% + var(--i, 0) * var(--step, 0.75%));
+}
+
+@keyframes text-resolve {
+  from {
+    color: var(--color-ink-subtle);
+  }
+  to {
+    color: var(--color-ink);
+  }
+}
+
+/* A vertical rail that fills as you scroll a long list — the hero film's scrub gesture, borrowed
+   for the pages that are one long enumeration. Its range is `cover 0% cover 100%`, so the fill
+   tracks the list's whole passage through the viewport rather than a moment at its edge.
+
+   Set on a 1px-wide element inside a `relative` parent; the track is the parent's own border. */
+@utility rail-fill {
+  transform-origin: top;
+  animation: rail-fill linear both;
+  animation-timeline: view();
+  animation-range: cover 0% cover 100%;
+  background-image: linear-gradient(
+    180deg,
+    var(--color-brand) 0%,
+    var(--color-brand-mid) 55%,
+    var(--color-accent-bright) 100%
+  );
+}
+
+@keyframes rail-fill {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Background fields.
+
+   The site is hairline-ruled on flat canvas, which is correct and, over eight
+   long pages, relentless. These are very low-contrast brand washes that give a
+   section a ground without introducing a card, a shadow or a border.
+
+   Built ONLY from the brand/accent tints. Never from `--confirmed` or
+   `--exception`: those are state vocabulary (rule 2 in the banner), and a
+   section that is faintly green would be saying something.
+   --------------------------------------------------------------------------- */
+
+@utility field {
+  background-image: radial-gradient(
+    58rem 30rem at 10% -12%,
+    color-mix(in srgb, var(--color-accent-wash) 80%, transparent),
+    transparent 68%
+  );
+}
+
+@utility field-alt {
+  background-image: radial-gradient(
+    58rem 30rem at 92% -12%,
+    color-mix(in srgb, var(--color-brand-mid) 7%, transparent),
+    transparent 66%
+  );
+}
+
 /* Every animation on this site is decorative by decision (ADR 0012 §5), so turning
    all of it off can never cost a visitor content. */
 @media (prefers-reduced-motion: reduce) {
@@ -421,6 +506,8 @@
   .rule-draw,
   .rule-brand,
   .accent-bar,
+  .rail-fill,
+  .text-resolve,
   .accent-resolve {
     animation: none !important;
     opacity: 1 !important;
@@ -433,6 +520,10 @@
      arrived. */
   .accent-resolve {
     color: var(--color-accent) !important;
+  }
+
+  .text-resolve {
+    color: var(--color-ink) !important;
   }
 
   .lift:hover {

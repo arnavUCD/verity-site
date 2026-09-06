@@ -1,0 +1,42 @@
+---
+/**
+ * A paragraph that darkens word by word as it crosses the viewport — the scroll-linked read-along.
+ *
+ * Each word is a span carrying its own index, and `text-resolve` (global.css) offsets both ends of
+ * that word's animation range by it, so the ink travels along the line instead of the whole block
+ * flipping at once.
+ *
+ * WHY THIS CANNOT HIDE ANYTHING. The two keyframes are `--ink-subtle` and `--ink`: both are
+ * legible, and the base declaration is the FINISHED one. A browser with no scroll-driven animation,
+ * a page loaded already scrolled past this, reduced motion — every one of those renders the
+ * paragraph fully inked. This effect can only ever darken text that is already readable, which is
+ * the bar ADR 0012 §5 sets and §12.4 restates after this site failed it once.
+ *
+ * THE STAGGER STEP IS COMPUTED, NOT FIXED. At a flat 0.75% per word a long paragraph would push
+ * its last words past the end of the `cover` phase, where they would simply never resolve. The step
+ * shrinks so the whole paragraph always finishes inside its range, whatever its length.
+ */
+interface Props {
+  /** Plain text. Markup is not supported on purpose — this splits on whitespace. */
+  text: string
+  class?: string
+  /** Rendered element. A lede is still a <p>; a pull-quote might not be. */
+  as?: 'p' | 'div'
+}
+
+const { text, class: className = '', as: Tag = 'p' } = Astro.props
+const words = text.split(/\s+/).filter(Boolean)
+
+/** Total spread stays at 45% of the cover phase no matter how many words there are. */
+const step = Math.min(0.75, 45 / Math.max(words.length, 1))
+---
+
+<Tag class={className} style={`--step: ${step.toFixed(3)}%`}>
+  {
+    words.map((word, i) => (
+      <span class="text-resolve" style={`--i: ${i}`}>
+        {word}{' '}
+      </span>
+    ))
+  }
+</Tag>
