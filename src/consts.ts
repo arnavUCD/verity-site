@@ -13,7 +13,7 @@ export const SITE_NAME = 'Verity'
  * already has the old one. That is not hypothetical here: the mark went from a placeholder equals
  * sign to the dome, and tabs opened before the change kept the equals sign through every deploy.
  */
-export const ICON_VERSION = 3
+export const ICON_VERSION = 4
 
 /**
  * Keeps the whole site out of search while it lives on a temporary GitHub Pages URL. Set to false

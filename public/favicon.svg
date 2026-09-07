@@ -1,30 +1,35 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <!-- The dome, matching Wordmark.astro. It replaced an equals sign (reconciliation — two records
-       made to agree) that outlived the mark it stood in for.
+  <!-- The dome, unboxed. Matches Wordmark.astro and the app's own rail mark.
 
-       Colours are MEASURED off the poster (`Verity Logo.png`), not approximated: paper #f2ebdb,
-       dome rim #2f5082 falling to core #0e2668. The gradient is the poster's, and it is what makes
-       the dome read as an object rather than a shape.
+       THE CREAM PLATE IS GONE. It used to sit behind this with a hairline edge, on the argument
+       that a browser tab is not the page: navy on a dark tab bar is close to invisible, so the
+       dome wanted a light ground, and cream on a white tab bar is close to invisible in turn, so
+       that ground wanted an edge. Sound reasoning, and the result was a beige tile rather than
+       the mark: the boxed dome read as a swatch of paper with something on it. Removed on the
+       user's direction, so the mark is now the mark everywhere it appears.
 
-       The cream plate is the poster's paper, not the site's canvas (#fafaf9), and that is
-       deliberate: this tile is the MARK, which is brand-true, rather than a swatch of the page.
-       It also makes the tab recognisable in a strip of white favicons.
+       The trade is real and worth stating rather than discovering: on a DARK browser theme the
+       navy has little to separate it from the tab bar. What compensates is size. With no plate
+       to sit inside, the dome fills the tile (r=13 against the old r=9), so it reads as a
+       silhouette by shape before colour.
 
-       The plate and its hairline are the one place this mark is boxed — a browser tab is not the
-       page. Navy on a dark tab bar is close to invisible, so the dome needs a light ground; cream
-       on a white tab bar is close to invisible in turn, so that ground needs an edge. In the page,
-       where neither problem exists, the mark is unboxed — see the note in Wordmark.astro.
+       NOTE FOR ANYONE EDITING THIS COMMENT: an XML comment may not contain a double hyphen, so
+       the CSS custom properties below are named without their leading dashes. Writing them in
+       full does not merely lint badly, it makes the file unparseable and the favicon vanishes.
 
-       Geometry is the wordmark's, scaled: one arc at r=9 from (7,21) to (25,21) is exactly a
-       semicircle, `z` closes the flat. Centred a half-unit low, because a dome carries its weight
-       at the base and sitting it on the true centre reads high. -->
+       Colours are MEASURED off the poster (`Verity Logo.png`), and they are the same two values
+       as the `color-brand` and `color-brand-mid` tokens in both stylesheets: rim #2f5082 falling
+       to core #142a6a. The gradient is the poster's own, and it is what makes the dome read as
+       an object rather than a flat shape.
+
+       Geometry: one arc at r=13 from (3,25) to (29,25) is exactly a semicircle, and `z` closes
+       the flat. Its base sits below the true centre, because a dome carries its weight at the
+       base and centring it optically reads high. -->
   <defs>
     <linearGradient id="dome" x1="0" y1="0" x2="0.55" y2="1">
       <stop offset="0%" stop-color="#2f5082" />
-      <stop offset="100%" stop-color="#0e2668" />
+      <stop offset="100%" stop-color="#142a6a" />
     </linearGradient>
   </defs>
-  <rect width="32" height="32" rx="6" fill="#f2ebdb" />
-  <rect x="1" y="1" width="30" height="30" rx="5.5" fill="none" stroke="#ddd4bd" />
-  <path d="M7 21a9 9 0 0 1 18 0z" fill="url(#dome)" />
+  <path d="M3 25a13 13 0 0 1 26 0z" fill="url(#dome)" />
 </svg>
