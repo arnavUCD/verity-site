@@ -29,17 +29,17 @@ const cases: Case[] = [
     situation:
       'A customer pays INV-1042 by ACH. Three weeks later their AP system pays it again from a re-approved copy of the same invoice.',
     without:
-      'The second payment sits unapplied, or gets applied to the wrong invoice. The customer is out the money until they reconcile their own books and complain — often a quarter later, by which point it is a relationship problem rather than an accounting one.',
-    with: 'Verity matches the second payment to an invoice it already holds a confirmed settlement for, classifies it as a duplicate, raises a credit note for the full amount, and posts it. It appears in the day’s report as done.',
+      'The second payment sits unapplied, or lands on the wrong invoice. The customer is out the money until they reconcile their own books and complain. That is usually a quarter later, by which point it is a relationship problem, not an accounting one.',
+    with: 'Verity matches the second payment to an invoice it already holds a confirmed settlement for, classifies it as a duplicate, raises a credit note for the full amount, and posts it. It shows up in the day’s report as done.',
   },
   {
     id: 'UC-2',
     title: 'The overpayment that becomes a credit balance',
     who: 'Finance head',
     tone: 'confirmed',
-    situation: 'An invoice for $48,500 is paid as $50,000 — rounded up, or an old rate applied.',
+    situation: 'An invoice for $48,500 is paid as $50,000. Rounded up, or an old rate applied.',
     without:
-      'Someone notices the mismatch, decides it is close enough, and applies the whole amount. The extra $1,500 is now wrong in two places, and nobody has written down why.',
+      'Someone notices the mismatch, decides it is close enough, and applies the whole amount. The extra $1,500 is now wrong in two places and nobody wrote down why.',
     with: 'Classified as an overpayment, credited for the excess, posted, reported. The customer’s balance is right without anyone having to notice.',
   },
   {
@@ -51,7 +51,7 @@ const cases: Case[] = [
       'Narration reads PAYMENT INV-1042 REF INV-1043. Two plausible invoices, one payment.',
     without:
       'A rules engine picks the first match and posts against the wrong customer account. Nobody finds it until a statement goes out.',
-    with: 'Two candidates means the floor is not cleared. It becomes an exception carrying both candidates and the model’s reading of the narration. A person spends thirty seconds on the one item that actually needed a person.',
+    with: 'Two candidates means the floor is not cleared. It becomes an exception carrying both candidates and the model’s reading of the narration. A person spends thirty seconds on the one item that needed a person.',
   },
   {
     id: 'UC-4',
@@ -62,7 +62,7 @@ const cases: Case[] = [
       'Most transactions. The reference is attribution-grade, the amount matches, the invoice is open.',
     without:
       'It still has to be matched by hand, because you cannot tell it is clean until you have checked it.',
-    with: 'Reconciled automatically. No credit note, no queue entry, no attention. This is the volume case, and it is what makes the exception list short enough to actually work.',
+    with: 'Reconciled automatically. No credit note, no queue entry, no attention. This is the volume case, and it is what keeps the exception list short enough to work.',
   },
   {
     id: 'UC-5',
@@ -72,7 +72,7 @@ const cases: Case[] = [
     situation: 'A support agent agrees to credit a customer for a service failure.',
     without:
       'An email to the billing team, a spreadsheet, and no consistent record of who agreed to what or why.',
-    with: 'The agent types the request in plain language. Verity extracts the invoice, amount and reason, fetches the invoice, checks policy — is the amount within the invoice total, is the invoice still creditable, was a reason given — and drafts the credit note with its reasoning attached. This one keeps a human decision by design: it is a commercial judgement, not a fact about a payment.',
+    with: 'The agent types the request in plain language. Verity pulls out the invoice, amount and reason, fetches the invoice, then checks policy. Is the amount within the invoice total? Is the invoice still creditable? Was a reason given? It drafts the credit note with its reasoning attached. This one keeps a human decision by design, because it is a commercial judgement, not a fact about a payment.',
   },
   {
     id: 'UC-6',
@@ -81,7 +81,7 @@ const cases: Case[] = [
     tone: 'confirmed',
     situation: '5:30pm. The finance head opens Verity.',
     without: 'They open the bank statement and start working.',
-    with: 'They read what was done — every automated decision with its basis — and work a short exception list. The two lists cannot overlap: an item is either settled or waiting, never presented as both.',
+    with: 'They read what was done, every automated decision with its basis, then work a short exception list. The two lists cannot overlap. An item is settled or waiting, never both.',
   },
   {
     id: 'UC-7',
@@ -90,7 +90,7 @@ const cases: Case[] = [
     tone: 'confirmed',
     situation: '“Who approved this credit?”',
     without: 'An email thread, if it still exists.',
-    with: 'The trail shows the decision, the actor, and what kind of actor it was — a person, the automated pipeline, or a worker executing a decision someone already made. Automation is never rendered as a human approval, so “the system did this automatically” is a defensible answer rather than an embarrassing discovery.',
+    with: 'The trail shows the decision, the actor, and what kind of actor it was: a person, the automated pipeline, or a worker executing a decision someone already made. Automation is never rendered as a human approval, so “the system did this automatically” is a defensible answer instead of an embarrassing discovery.',
   },
   {
     id: 'UC-8',
@@ -100,19 +100,19 @@ const cases: Case[] = [
     situation: 'A bank connection expires. Transactions stop arriving.',
     without:
       'Nothing looks wrong. Empty queues look like a quiet week. It surfaces at close, when it is expensive.',
-    with: 'Verity detects the configured-but-not-processing state and raises it. The absence of work is itself monitored — which is the hardest class of failure for a person to notice.',
+    with: 'Verity detects the configured-but-not-processing state and raises it. The absence of work is itself monitored, which is the hardest kind of failure for a person to catch.',
   },
 ]
 ---
 
 <BaseLayout
   title="Use cases"
-  description="Eight situations from a real finance week — duplicate payments, overpayments, ambiguous references, goodwill credits, the close, and the audit question — with and without Verity."
+  description="Eight situations from a real finance week, with and without Verity: duplicate payments, overpayments, ambiguous references, goodwill credits, the close, and the audit question."
 >
   <PageHero
     eyebrow="Use cases"
     title="Eight situations from an ordinary finance week."
-    lede="None of these are hard problems. All of them need context, and all of them cost more the longer they sit. Each is written as it actually happens: the situation, what today looks like, and what changes."
+    lede="None of these are hard problems. All of them need context, and all of them cost more the longer they sit. Each one is written the way it happens: the situation, what today looks like, and what changes."
   />
 
   <section id="cases" class="section-y field">
@@ -196,14 +196,15 @@ const cases: Case[] = [
             Four numbers we would rather you calculated than read.
           </h2>
           <p class="text-ink-muted mt-6 text-lg leading-relaxed">
-            We publish no benchmark figures, because we have none that are ours. These come out of
-            your own system, and a number you computed is worth more than a statistic we printed.
+            We publish no benchmark figures, because we have none that are ours. These four come out
+            of your own system. A number you worked out yourself is worth more than a statistic we
+            printed.
           </p>
         </div>
         <ol class="space-y-6">
           {
             [
-              'How many payments in the last 12 months were a second payment against an already-settled invoice — and what were they worth?',
+              'How many payments in the last 12 months were a second payment against an already-settled invoice, and what were they worth?',
               'How much is sitting in unapplied or suspense right now, and how old is the oldest item?',
               'How many person-hours a week go into matching payments, and at what seniority?',
               'How many days of the monthly close go to payment reconciliation and the corrections that fall out of it?',
@@ -221,6 +222,6 @@ const cases: Case[] = [
 
   <CTASection
     title="Bring us the messiest week you have"
-    body="The useful demo is not the clean one. If your narration is truncated, your references are missing and half the payments are part-payments, that is the interesting conversation."
+    body="The useful demo is not the clean one. If your narration is truncated, your references are missing and half the payments are part payments, that is the interesting conversation."
   />
 </BaseLayout>

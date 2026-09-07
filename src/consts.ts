@@ -42,8 +42,8 @@ export const CONTACT_EMAIL = 'hello@verity.example.com'
 
 export const SITE_DESCRIPTION =
   'Verity is an agentic accounting operations layer. It connects your bank and your billing ' +
-  'system, works out what each payment actually was, credits what is owed, and posts it back — ' +
-  'on its own. You read the end-of-day report.'
+  'system, works out what each payment was, credits what is owed, and posts it back on its own. ' +
+  'You read the end-of-day report.'
 
 /** One row inside a nav item's dropdown: a link to a SECTION of that item's page. */
 export interface NavSection {

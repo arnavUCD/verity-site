@@ -19,32 +19,32 @@ const pipeline = [
   {
     n: '01',
     title: 'Ingest',
-    body: 'Verity polls your bank feed every few minutes, resuming from where it left off rather than re-sweeping history. A retried poll or a restart mid-batch produces no duplicate rows.',
+    body: 'Verity reads your bank feed every few minutes. It picks up where it left off instead of re-sweeping history, so a retry or a restart mid-batch never doubles a transaction.',
   },
   {
     n: '02',
     title: 'Match',
-    body: 'Each payment is matched to the invoice it belongs to — on confirmed evidence, or not at all. Zero candidates, or more than one, is an exception rather than a guess.',
+    body: 'Every payment is matched to the invoice it belongs to, on confirmed evidence or not at all. No candidate is a guess. Nothing gets attributed on a hunch.',
   },
   {
     n: '03',
     title: 'Classify',
-    body: 'Duplicate, overpayment, normal payment, or unmatchable. Duplicate detection reads Verity’s own confirmed history, never your billing system’s opaque “paid” flag.',
+    body: 'Duplicate, overpayment, normal payment, or unmatchable. Duplicate detection reads what Verity has confirmed itself. It never trusts your billing system’s “paid” flag, which can mean a dozen things.',
   },
   {
     n: '04',
     title: 'Act',
-    body: 'A credit note where one is owed; a reconciliation where none is. The decision is recorded as an automated decision, in its own record, labelled as automation.',
+    body: 'A credit note where one is owed. A reconciliation where none is. The decision is written to its own record and labelled as automation, so no report can dress it up as a human approval.',
   },
   {
     n: '05',
     title: 'Post',
-    body: 'The correction is written back to your billing system through a recoverable queue. A write that fails — or succeeds with the acknowledgement lost — is retried without risking a second posting.',
+    body: 'The correction goes back to your billing system through a recoverable queue. A write that fails gets retried. So does one that succeeded while the acknowledgement went missing, without posting twice.',
   },
   {
     n: '06',
     title: 'Report',
-    body: 'At end of day: what the pipeline did, and what still needs you. The two lists cannot overlap — an item is settled or waiting, never presented as both.',
+    body: 'At end of day you get two lists: what Verity settled, and what still needs you. They cannot overlap. An item is done or it is waiting, never both.',
   },
 ]
 
@@ -84,9 +84,9 @@ const connectors = [
             HERE, on the problem, because this is the passage a finance reader is meant to recognise
             their own week in — and pacing it slows them down enough to. */}
         <div class="max-w-2xl space-y-5 text-lg leading-relaxed">
-          <ResolveText text="A payment lands. Somebody — usually the most senior person who understands the customer — opens the bank statement, then the accounting system, and starts matching." />
-          <ResolveText text="The reference is missing or truncated. The amount is two invoices paid together, or a part payment. It’s the second payment against an invoice settled last month, and nobody will notice until the customer complains." />
-          <ResolveText class="font-medium" text="None of it is hard. All of it needs context. And it stays invisible until it compounds into a slow close, an angry customer, or a number nobody can explain." />
+          <ResolveText text="A payment lands. Someone opens the bank statement, then the accounting system, and starts matching. Usually it is the most senior person who understands the customer." />
+          <ResolveText text="The reference is missing. The amount covers two invoices at once, or only part of one. It is the second payment on an invoice you settled last month, and nobody catches it until the customer calls." />
+          <ResolveText class="font-medium" text="None of it is hard. All of it needs context. And it stays invisible until it turns into a slow close, an angry customer, or a number nobody can explain." />
         </div>
       </div>
     </div>
@@ -129,17 +129,17 @@ const connectors = [
           <div class="text-ink-muted mt-7 space-y-5 text-lg leading-relaxed">
             <p>
               Bank narration is hostile to machines. A reference number sitting in a payment
-              description is a hint — and automating on hints is how wrong entries reach real books.
+              description is a hint. Automating on hints is how wrong entries reach real books.
             </p>
             <p class="text-ink font-medium">
               So the model advises; it never authorizes.
             </p>
             <p>
               A language model reads the messy narration and proposes a candidate. That proposal
-              cannot be what causes money to move. Only an attribution-grade reference — one the
-              payment itself carries, confirmed against the invoice it names — clears the floor.
-              Everything above it is handled end to end. Everything below it becomes an exception,
-              with the model’s reading attached as context.
+              can never be what moves money. Only a reference the payment itself carries, confirmed
+              against the invoice it names, clears the floor. Everything above the floor is handled
+              end to end. Everything below it becomes an exception, with the model’s reading
+              attached as context.
             </p>
           </div>
         </div>
@@ -151,8 +151,8 @@ const connectors = [
             A reference the payment itself carries, confirmed against the invoice it names.
           </p>
           <p class="text-ink-muted mt-4 leading-relaxed">
-            Everything that clears it is handled end to end. Everything that does not becomes an
-            exception, with the model’s reading attached as context — never as authority.
+            Clear the floor and Verity handles it end to end. Fall short and it becomes an
+            exception. The model’s reading rides along as context, never as authority.
           </p>
           <a
             href={url('/how-it-works#matching-floor')}
@@ -180,14 +180,15 @@ const connectors = [
           </h2>
           <div class="text-ink-muted mt-7 space-y-5 text-lg leading-relaxed">
             <p>
-              The end-of-day report is two lists that cannot overlap: everything the pipeline
-              settled today, each with the basis for its decision — and the short list of items whose
-              evidence didn’t settle, waiting for you.
+              The end-of-day report is two lists that cannot overlap. Everything Verity settled
+              today, each with the basis for its decision. And the short list whose evidence did not
+              settle, waiting for you.
             </p>
             <p>
-              Every action is stamped at write time with what kind of actor took it, so automation is
-              never recorded as a human approval — and Verity can say what fraction of your money
-              decisions had no human in the loop at all.
+              Every action is stamped at write time with the kind of actor that took it. Automation
+              is never recorded as a human approval. That means Verity can tell you what share of
+              your money decisions had no human in the loop at all, which most finance tools cannot
+              answer.
             </p>
           </div>
         </div>
@@ -225,8 +226,8 @@ const connectors = [
           </h2>
         </div>
         <p class="text-ink-muted max-w-md text-sm leading-relaxed">
-          A connector is listed as available only when it can carry you end to end. The rest say
-          what’s missing. We’d rather show you this than a logo grid that connects to nothing.
+          A connector is listed as available only when it carries you end to end. The rest say what
+          is missing. We would rather show you this than a logo grid that connects to nothing.
         </p>
       </div>
 
@@ -267,9 +268,9 @@ const connectors = [
             Finance teams where one person is the bottleneck.
           </h2>
           <p class="text-ink-muted mt-6 max-w-lg text-lg leading-relaxed">
-            B2B, invoiced rather than card-paid, enough payment volume that reconciliation is a
-            weekly grind, and a finance head personally doing work they shouldn’t be — because
-            there’s nobody to hand it to.
+            You invoice your customers instead of charging cards. Enough payments arrive that
+            reconciliation is a weekly grind. And your finance head is doing the matching
+            personally, because there is nobody to hand it to.
           </p>
         </div>
 
@@ -280,9 +281,9 @@ const connectors = [
             We’re pre-launch and onboarding design partners now.
           </p>
           <ul class="text-ink-muted mt-5 space-y-2.5 text-sm">
-            <li>— Direct access to the people building it; your exception patterns shape the matcher.</li>
-            <li>— Your accounting system moves up the connector roadmap.</li>
-            <li>— Pricing locked for the partnership period.</li>
+            <li>Direct access to the people building it. Your exception patterns shape the matcher.</li>
+            <li>Your accounting system moves up the connector roadmap.</li>
+            <li>Pricing locked for the partnership period.</li>
           </ul>
           <div class="mt-8 flex flex-wrap gap-3">
             <CtaButton

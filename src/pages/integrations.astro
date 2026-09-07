@@ -27,15 +27,15 @@ const providers: Provider[] = [
     tier: 'Bank aggregator',
     available: true,
     auth: 'You connect your bank through Plaid’s own consent flow. Your banking credentials never reach us.',
-    note: 'This is the intake side of the product. Transactions sync incrementally, every few minutes, resuming from where the last poll stopped.',
+    note: 'This is the intake side of the product. Transactions sync every few minutes, picking up from where the last poll stopped.',
   },
   {
     name: 'Zoho Books',
     kind: 'Billing system',
     tier: 'Cloud OAuth',
     available: true,
-    auth: 'You are sent to Zoho to sign in and approve read access to your invoices. Your password never reaches us — we receive a token, stored against your organisation alone.',
-    note: 'Read-only to start: the connection asks for permission to read invoices and to see which organisation you picked. Issuing money back into Zoho uses a separate, narrower credential and is not part of that consent.',
+    auth: 'You are sent to Zoho to sign in and approve read access to your invoices. Your password never reaches us. We receive a token, stored against your organisation alone.',
+    note: 'Read-only to start. The connection asks permission to read invoices and to see which organisation you picked. Issuing money back into Zoho uses a separate, narrower credential and is not part of that consent.',
   },
   {
     name: 'QuickBooks Online',
@@ -43,7 +43,7 @@ const providers: Provider[] = [
     tier: 'Cloud OAuth',
     available: false,
     auth: 'Will work exactly like Zoho Books: sent to Intuit to sign in and approve read access. No password or key is ever typed into our screens.',
-    note: 'The connect flow for this tier already exists. What is missing is the adapter that turns QuickBooks invoices into the one invoice shape the rest of the product understands. Until that adapter passes our shared contract test, connecting would give you a link that reads nothing.',
+    note: 'The connect flow for this tier already exists. What is missing is the adapter that turns QuickBooks invoices into the one shape the rest of the product understands. Until that adapter passes our shared contract test, connecting would give you a link that reads nothing.',
   },
   {
     name: 'Xero',
@@ -51,15 +51,15 @@ const providers: Provider[] = [
     tier: 'Cloud OAuth',
     available: false,
     auth: 'Will work exactly like Zoho Books: sent to Xero to sign in and approve read access.',
-    note: 'Not connectable yet, for the same reason as QuickBooks: the redirect-and-consent half is built, the adapter is not. We would rather show you this than a button that connects to nothing.',
+    note: 'Not connectable yet, for the same reason as QuickBooks. The redirect-and-consent half is built, the adapter is not. We would rather show you this than a button that connects to nothing.',
   },
   {
     name: 'Odoo',
     kind: 'Billing system',
     tier: 'API key',
     available: false,
-    auth: 'Odoo does not offer the sign-in-and-approve flow the others do. It would ask you to paste an API key you generate in Odoo, plus — if you self-host — your server address and database name.',
-    note: 'Not connectable yet, and the reason is ours rather than Odoo’s: a key you paste is a secret we would have to hold, and we do not yet encrypt stored credentials with a managed key. We are not willing to keep your Odoo key in plain text in our database, so the field does not exist until that does.',
+    auth: 'Odoo does not offer the sign-in-and-approve flow the others do. It would ask you to paste an API key you generate in Odoo, plus your server address and database name if you self-host.',
+    note: 'Not connectable yet, and the reason is ours rather than Odoo’s. A key you paste is a secret we would have to hold, and we do not yet encrypt stored credentials with a managed key. We will not keep your Odoo key in plain text, so the field does not exist until the storage does.',
   },
   {
     name: 'TallyPrime',
@@ -67,7 +67,7 @@ const providers: Provider[] = [
     tier: 'Local connector',
     available: false,
     auth: 'TallyPrime runs on your own machine, not in the cloud, so there is nothing for us to send you to. Connecting will mean installing a small connector on the computer that runs Tally and pairing it with a one-time code.',
-    note: 'Not connectable yet. Tally listens on your own computer behind your firewall, so our servers genuinely cannot reach it — this is not a missing feature we can add to a settings screen. The connector reads Tally locally and pushes out to us, so you never open a hole in your firewall. It is a real piece of software with an installer and an update path, tracked as its own project.',
+    note: 'Not connectable yet. Tally listens on your own computer behind your firewall, so our servers cannot reach it. This is not a missing feature we can add to a settings screen. The connector reads Tally locally and pushes out to us, so you never open a hole in your firewall. It is real software with an installer and an update path, tracked as its own project.',
   },
 ]
 
@@ -79,7 +79,7 @@ const tiers = [
   },
   {
     tier: 'API key',
-    what: 'A key you generate and paste, plus a server address and database name for self-hosted systems — details OAuth would never carry.',
+    what: 'A key you generate and paste, plus a server address and database name for self-hosted systems. OAuth never carries those details.',
     state: 'Blocked on encrypted credential storage, deliberately. See Odoo below.',
   },
   {
@@ -92,12 +92,12 @@ const tiers = [
 
 <BaseLayout
   title="Integrations"
-  description="Plaid for the bank feed and Zoho Books for billing are connectable today. QuickBooks, Xero, Odoo and TallyPrime each carry the real reason they are not — no logo wall, no pretend connectors."
+  description="Plaid for the bank feed and Zoho Books for billing are connectable today. QuickBooks, Xero, Odoo and TallyPrime each carry the real reason they are not. No logo wall, no pretend connectors."
 >
   <PageHero
     eyebrow="Integrations"
-    title="A short, honest list — and the real reason for every gap."
-    lede="A connector is listed as available only when it can carry you end to end. Everything else says exactly what is missing and why. We would rather show you this than a wall of logos that connect to nothing."
+    title="A short, honest list, and the real reason for every gap."
+    lede="A connector is listed as available only when it carries you end to end. Everything else says exactly what is missing and why. We would rather show you this than a wall of logos that connect to nothing."
   />
 
   <section id="providers" class="section-y">
@@ -159,8 +159,8 @@ const tiers = [
             They are not interchangeable, so we do not pretend they are.
           </h2>
           <p class="text-ink-muted mt-6 text-lg leading-relaxed">
-            Most integration pages flatten every system into one logo grid. The differences matter:
-            they decide what a connection asks of you, where a credential lives, and how long the
+            Most integration pages flatten every system into one logo grid. The differences matter.
+            They decide what a connection asks of you, where a credential lives, and how long the
             work takes.
           </p>
         </div>
@@ -192,13 +192,13 @@ const tiers = [
           <div class="text-ink-muted mt-7 space-y-5 text-lg leading-relaxed">
             <p>
               Every adapter maps your billing system’s invoices into a single canonical shape. The
-              matching and classification logic only ever sees that shape — never a vendor’s raw
+              matching and classification logic only ever sees that shape, never a vendor’s raw
               format.
             </p>
             <p>
-              This is why a new connector is a contained piece of work rather than a rewrite, and
-              why an adapter has to pass a shared contract test before it can be switched on. It is
-              also why we will not list a provider as available on the strength of a login screen.
+              That is why a new connector is contained work instead of a rewrite, and why an adapter
+              has to pass a shared contract test before it can be switched on. It is also why we will
+              not list a provider as available on the strength of a login screen.
             </p>
           </div>
         </div>

@@ -14,11 +14,11 @@ import ResolveText from '@/components/ResolveText.astro'
 const guarantees = [
   {
     title: 'One tenant can never read another',
-    how: 'Isolation is enforced by the database with row-level security, scoped per tenant — not by application code remembering to add a WHERE clause. A missing filter is a bug; a missing row-level policy is a refused query.',
+    how: 'The database enforces isolation with row-level security, scoped per tenant. Application code never has to remember a WHERE clause. A missing filter is a bug. A missing row-level policy is a refused query.',
   },
   {
     title: 'A credit is never issued twice',
-    how: 'Every request carries an idempotency key, and every external write is drained through a recoverable queue. The dangerous case — the write succeeded but the acknowledgement was lost — is handled as its own state rather than retried blindly.',
+    how: 'Every request carries an idempotency key, and every external write drains through a recoverable queue. The dangerous case is a write that succeeded while the acknowledgement went missing. That gets its own state instead of a blind retry.',
   },
   {
     title: 'Automation is never recorded as a human decision',
@@ -30,7 +30,7 @@ const guarantees = [
   },
   {
     title: 'An agent cannot approve or issue on its own authority',
-    how: 'The agent modules import only the agent surface — they have no access to approval or issuance code paths at all. This is structural rather than procedural: it is enforced by what those modules can reach, and covered by a test that asserts it across every agent module.',
+    how: 'The agent modules import only the agent surface. They cannot reach approval or issuance code at all. This is structural, not procedural, and a test asserts it across every agent module.',
   },
   {
     title: 'Invoices are read-only',
@@ -60,7 +60,7 @@ const credentials = [
 
 <BaseLayout
   title="Security"
-  description="How Verity isolates tenants, handles credentials, and records who — or what — made every decision. Including a plain statement of what we have not yet done."
+  description="How Verity isolates tenants, handles credentials, and records who or what made every decision. Including a plain statement of what we have not done yet."
 >
   <PageHero
     eyebrow="Security"
@@ -129,11 +129,11 @@ const credentials = [
             Collects nothing, so it can leak nothing.
           </h2>
           <div class="text-ink-muted mt-7 space-y-5 text-lg leading-relaxed">
-            <ResolveText text="There is no form on this site, no analytics, no tracking pixel, no chat widget, and no cookie banner — because there is nothing to consent to. Fonts are self-hosted, so your browser makes no third-party request while reading this page." />
+            <ResolveText text="There is no form on this site, no analytics, no tracking pixel, no chat widget, and no cookie banner, because there is nothing to consent to. Fonts are self-hosted, so your browser makes no third-party request while reading this page." />
             <p>
               The only routes out are a link to the product demo and an email address. That is a
-              deliberate constraint rather than a stage we have not got to yet: a marketing site
-              that collects nothing cannot be the weak link in a security review.
+              deliberate constraint, not a stage we have not got to yet. A marketing site that
+              collects nothing cannot be the weak link in a security review.
             </p>
           </div>
         </div>
@@ -150,7 +150,7 @@ const credentials = [
             <p>
               <span class="text-ink font-medium">Stored credentials are not yet encrypted with a
                 managed key.</span> That is a real gap, it is why the API-key connector tier is closed,
-              and it is the reason rather than an excuse.
+              and it is the reason, not an excuse.
             </p>
             <p>
               What we can do today is describe exactly how isolation, credentials, write-back and
@@ -173,7 +173,7 @@ const credentials = [
         </h2>
         <div class="text-ink-muted mt-7 space-y-5 text-lg leading-relaxed">
           <p>
-            For any credit Verity raised you can see what was decided, when, by whom — and what kind
+            For any credit Verity raised you can see what was decided, when, by whom, and what kind
             of actor that was. Automated decisions carry the evidence that justified them: the
             reference that cleared the matching floor, the invoice it was confirmed against, and the
             classification that followed.
@@ -190,6 +190,6 @@ const credentials = [
 
   <CTASection
     title="Send us your security questionnaire"
-    body="We would rather answer a hard one early than a soft one late. If your reviewer needs detail we have not published here, ask — the answer will either be the mechanism or an honest “not yet”."
+    body="We would rather answer a hard one early than a soft one late. If your reviewer needs detail we have not published here, ask. The answer will be either the mechanism or an honest “not yet”."
   />
 </BaseLayout>

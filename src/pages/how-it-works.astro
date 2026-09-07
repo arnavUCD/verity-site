@@ -16,23 +16,23 @@ const steps = [
     n: '01',
     name: 'Ingest',
     line: 'Read once, never twice',
-    body: 'Verity polls your bank feed every few minutes and resumes from a saved cursor rather than re-sweeping history. Ingestion is idempotent: a retried poll, a network blip, or a restart that lands mid-batch produces no duplicate rows.',
+    body: 'Verity reads your bank feed every few minutes and resumes from a saved cursor instead of re-sweeping history. A retried poll, a network blip, or a restart mid-batch produces no duplicate rows.',
     detail:
-      'This is the least glamorous step and the one most in-house builds get wrong. Exactly-once intake is what makes every downstream decision safe to repeat.',
+      'This is the least glamorous step and the one most in-house builds get wrong. Reading each transaction exactly once is what makes every decision after it safe to repeat.',
   },
   {
     n: '02',
     name: 'Match',
     line: 'Matched only on proof',
-    body: 'Each transaction is matched to the invoice it belongs to — on confirmed evidence, or not at all. An attribution-grade reference that the payment itself carries, confirmed by fetching that invoice from your billing system, clears the floor. Nothing else does.',
+    body: 'Every transaction is matched to the invoice it belongs to, on confirmed evidence or not at all. Clearing the floor takes a reference the payment itself carries, checked against that invoice in your billing system. Nothing else counts.',
     detail:
-      'Zero candidates is an exception. More than one candidate is an exception. An unresolved sibling transaction against the same invoice in the same batch is an exception. The system does not break ties.',
+      'Zero candidates is an exception. More than one is an exception. So is an unresolved sibling payment against the same invoice in the same batch. Verity does not break ties.',
   },
   {
     n: '03',
     name: 'Classify',
     line: 'Duplicate, overpayment, or clean',
-    body: 'Matched transactions resolve to one of four types. Duplicate detection reads Verity’s own confirmed history — never your billing system’s opaque “paid” flag, which can be set for a dozen reasons Verity cannot see.',
+    body: 'Matched transactions resolve to one of four types. Duplicate detection reads what Verity has confirmed itself. It never reads your billing system’s “paid” flag, which can be set for a dozen reasons Verity cannot see.',
     detail:
       'Reasoning about money from a flag you did not write and cannot explain is how wrong credits get issued. We read what we can prove.',
   },
@@ -40,31 +40,31 @@ const steps = [
     n: '04',
     name: 'Act',
     line: 'A credit where one is owed',
-    body: 'Duplicates and overpayments produce a credit note for the right amount. Normal payments are reconciled with no credit at all. The decision is recorded as an automated decision, in its own record, labelled as automation.',
+    body: 'Duplicates and overpayments produce a credit note for the right amount. Normal payments are reconciled with no credit at all. The decision goes to its own record, labelled as automation.',
     detail:
-      'It is never written into the human decision record. No report can later present it as something a person signed off.',
+      'It never touches the human decision record. No report can later present it as something a person signed off.',
   },
   {
     n: '05',
     name: 'Post',
     line: 'Written back, idempotently',
-    body: 'The correction is queued and drained to your billing system by a separate worker, with idempotency and in-doubt recovery. A write that fails is retried without risking a second posting.',
+    body: 'The correction is queued and drained to your billing system by a separate worker. A write that fails is retried without risking a second posting.',
     detail:
-      'The dangerous case is not a failed write — it is a write that succeeded while the acknowledgement was lost. That is handled as its own state rather than retried blindly.',
+      'The dangerous case is not a failed write. It is a write that succeeded while the acknowledgement went missing. That gets its own state instead of a blind retry.',
   },
   {
     n: '06',
     name: 'Report',
     line: 'Posted back to your books',
-    body: 'At the end of the day you get two lists: everything the pipeline settled, each with the basis for its decision, and the short list of items whose evidence did not settle.',
+    body: 'At the end of the day you get two lists. Everything Verity settled, each with the basis for its decision. And the short list whose evidence did not settle.',
     detail:
-      'The two cannot overlap. An item is either something the pipeline resolved or something waiting for you — never presented as both.',
+      'The two cannot overlap. An item is either resolved or waiting for you. It is never presented as both.',
   },
 ]
 
 const types = [
   { type: 'normal_payment', means: 'The payment settles the invoice it names', does: 'Reconciled. No credit.', tone: 'confirmed' },
-  { type: 'duplicate', means: 'The invoice was already settled by an earlier confirmed payment', does: 'Credit note for the duplicated amount', tone: 'confirmed' },
+  { type: 'duplicate', means: 'An earlier confirmed payment already settled this invoice', does: 'Credit note for the duplicated amount', tone: 'confirmed' },
   { type: 'overpayment', means: 'The payment exceeds what the invoice was for', does: 'Credit note for the excess', tone: 'confirmed' },
   { type: 'unmatchable', means: 'The evidence does not settle it', does: 'Routed to a person, with the reasoning attached', tone: 'exception' },
 ]
@@ -77,7 +77,7 @@ const types = [
   <PageHero
     eyebrow="How it works"
     title="What happens between a payment landing and your books being right."
-    lede="Verity sits between two systems you already have: your bank, and your billing system. Between them it does the loop a person is doing today — six steps, of which five need no one."
+    lede="Verity sits between two systems you already have: your bank, and your billing system. Between them it runs the loop a person runs today. Six steps, and five of them need nobody."
   />
 
   {/* --------------------------------------------------------------- the two doors */}
@@ -89,17 +89,17 @@ const types = [
           <h2 class="mt-5 text-2xl font-medium">The bank feed finds the work</h2>
           <p class="text-ink-muted mt-4 leading-relaxed">
             Nobody types anything. Payments arrive, Verity works out what each one was, and the ones
-            it can prove are handled end to end — including the write-back. This is the engine, and
-            it runs whether or not anyone signs in.
+            it can prove are handled end to end, including the write-back. This is the engine. It
+            runs whether or not anyone signs in.
           </p>
         </div>
         <div class="border-hairline bg-surface rounded-lg lift border p-8">
           <span class="chip chip-neutral">secondary</span>
           <h2 class="mt-5 text-2xl font-medium">A person asks, in plain language</h2>
           <p class="text-ink-muted mt-4 leading-relaxed">
-            “Credit $2,000 on INV-1042 — duplicate charge.” The agent extracts the invoice, amount
+            “Credit $2,000 on INV-1042, duplicate charge.” The agent pulls out the invoice, amount
             and reason, fetches the invoice, and checks it against policy before any draft exists.
-            It is a real feature and it demos well, but it is the fallback — not the engine.
+            It is a real feature and it demos well. It is also the fallback, not the engine.
           </p>
         </div>
       </div>
@@ -153,18 +153,17 @@ const types = [
           <div class="text-ink-muted mt-7 space-y-5 text-lg leading-relaxed">
             <p>
               Bank narration is hostile to machines. <span class="mono text-ink text-base">WIRE
-              IN NORTHWIND TRADING INV-1042</span> is a good day; a reference field containing
-              nothing but a trace number is a normal one.
+              IN NORTHWIND TRADING INV-1042</span> is a good day. A reference field holding nothing
+              but a trace number is a normal one.
             </p>
             <p>
               A language model reads that narration and proposes a candidate. That proposal is
-              <span class="text-ink font-medium"> advisory</span>: it can enrich an exception so the
-              person reviewing it starts with context, and it cannot be the thing that causes money
-              to move.
+              <span class="text-ink font-medium"> advisory</span>. It can enrich an exception so the
+              person reviewing it starts with context. It can never be the thing that moves money.
             </p>
             <ResolveText text="What can: a reference the payment itself carries, confirmed against the invoice it names. Everything above that floor is handled automatically. Everything below it becomes an exception." />
             <p class="text-ink">
-              This is the distinction the whole product rests on — <span class="font-medium"
+              The whole product rests on one distinction: <span class="font-medium"
                 >existence is not attribution</span
               >. Finding a number that looks like an invoice reference is not the same as knowing
               the payment belongs to that invoice.
@@ -193,8 +192,8 @@ const types = [
             </ul>
           </div>
           <p class="text-ink-subtle mt-5 text-sm leading-relaxed">
-            Ambiguity resolves to <span class="mono">unmatchable</span> — never to a guess. A tie is
-            not broken; it is escalated.
+            Ambiguity resolves to <span class="mono">unmatchable</span>, never to a guess. A tie is
+            not broken. It is escalated.
           </p>
         </div>
       </div>
@@ -218,9 +217,9 @@ const types = [
               had no human in the loop.
             </p>
             <p>
-              Most systems cannot tell their own automation apart from their users. That makes
-              “the system did this automatically” an awkward discovery in an audit rather than a
-              defensible answer. Here it is a first-class, recorded fact.
+              Most systems cannot tell their own automation apart from their users. That turns “the
+              system did this automatically” into an awkward discovery during an audit. Here it is a
+              recorded fact you can hand over.
             </p>
             <p>
               Verity also watches for the failure nobody notices: a feed that is configured but not
@@ -235,17 +234,16 @@ const types = [
             Removing the approval step for bank-matched payments
           </h3>
           <p class="text-ink-muted mt-4 leading-relaxed">
-            Where attribution is confirmed, the pipeline will classify, credit and post with no
-            pre-write human gate. The finance head’s role becomes the end-of-day report and the
-            exception queue.
+            Where attribution is confirmed, Verity will classify, credit and post with no human gate
+            before the write. The finance head keeps the end-of-day report and the exception queue.
           </p>
           <p class="text-ink-muted mt-4 text-sm leading-relaxed">
-            It would be reckless if approval were the only control. It isn’t, and it was never the
-            strongest one — a person rubber-stamping a queue of confident matches is approving the
-            same evidence the system already confirmed. The matching floor, idempotent writes, the
-            recoverable posting queue, honest audit and the exception route all stay exactly where
-            they are. Discretionary credits keep a human decision, because there the evidence is a
-            commercial judgement rather than a fact about a payment.
+            That would be reckless if approval were the only control. It never was the strongest
+            one. A person rubber-stamping a queue of confident matches is approving the same
+            evidence the system already confirmed. The matching floor, idempotent writes, the
+            recoverable posting queue, honest audit and the exception route all stay. Discretionary
+            credits keep a human decision, because there the evidence is a commercial judgement
+            rather than a fact about a payment.
           </p>
         </div>
       </div>
