@@ -6,6 +6,16 @@
 export const SITE_NAME = 'Verity'
 
 /**
+ * Cache-buster for the favicon, appended as `?v=`. BUMP THIS ANY TIME public/favicon.svg CHANGES.
+ *
+ * A browser's favicon store is not its HTTP cache. It ignores `cache-control` and keys icons by
+ * URL more or less permanently, so replacing the file alone does not reach anyone whose tab
+ * already has the old one. That is not hypothetical here: the mark went from a placeholder equals
+ * sign to the dome, and tabs opened before the change kept the equals sign through every deploy.
+ */
+export const ICON_VERSION = 3
+
+/**
  * Keeps the whole site out of search while it lives on a temporary GitHub Pages URL. Set to false
  * the day it moves to the real domain — otherwise a throwaway `github.io` address competes with
  * that domain for your own name, and half-finished pages rank before you meant them to.

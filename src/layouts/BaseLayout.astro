@@ -9,7 +9,7 @@
  */
 import SiteFooter from '@/components/SiteFooter.astro'
 import SiteHeader from '@/components/SiteHeader.astro'
-import { NOINDEX, SITE_DESCRIPTION, SITE_NAME } from '@/consts'
+import { ICON_VERSION, NOINDEX, SITE_DESCRIPTION, SITE_NAME } from '@/consts'
 import { url } from '@/lib/url'
 import '@/styles/global.css'
 
@@ -49,7 +49,12 @@ const fullTitle = `${title} · ${SITE_NAME}`
     <meta name="color-scheme" content="light" />
     <meta name="theme-color" content="#fafaf9" />
 
-    <link rel="icon" href={url("/favicon.svg")} type="image/svg+xml" />
+    {/* THE ?v= IS LOAD-BEARING, not decoration. A browser's favicon store is separate from its
+        HTTP cache: it ignores `cache-control` (GitHub serves this one at max-age=600) and keys
+        icons by URL, effectively forever. The mark here changed twice — placeholder equals sign,
+        then the dome — and tabs opened before those changes kept showing the old glyph with no
+        amount of reloading, because the URL never moved. Bump this whenever the icon changes. */}
+    <link rel="icon" href={url(`/favicon.svg?v=${ICON_VERSION}`)} type="image/svg+xml" />
     <link rel="sitemap" href={url("/sitemap-index.xml")} />
   </head>
 
