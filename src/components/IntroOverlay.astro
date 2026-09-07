@@ -1,0 +1,199 @@
+---
+/**
+ * The front door: a tagline, then a fast marquee of real capabilities, then it lifts to reveal
+ * the homepage — which is already fully rendered underneath it. On the user's direction, after
+ * looking at a reference (opraah.in): that site turned out to have no gate at all, just two
+ * sections of one long scroll. This is the real thing: a sequence that has to resolve before the
+ * ordinary page is what the visitor is looking at.
+ *
+ * THAT IS EXACTLY WHAT ADR 0012 §5 FORBIDS BY DEFAULT — "no animation may gate content" — so
+ * everything below exists to satisfy the letter of that rule while still building the gate the
+ * user asked for. THE RESOLUTION: the gate is added ENTIRELY BY SCRIPT, never present without it.
+ *
+ *   NO JS → this component renders NOTHING (not even hidden markup). The homepage is simply what
+ *   is on the page, exactly like `ScrollFilm`'s own no-JS case.
+ *   REDUCED MOTION → same: the script checks the media query BEFORE building anything, and exits.
+ *   ARRIVING AT A `#section` ANCHOR → same: a visitor who followed a link to a specific part of
+ *   the page came to see that part, not a tagline. The script checks `location.hash` first.
+ *   A SECOND VISIT THIS SESSION → same, via `sessionStorage`. It plays once per tab per session,
+ *   not on every back-navigation to `/`.
+ *
+ * In every one of those cases the fallback is not a degraded overlay — it is NO OVERLAY, which is
+ * the same shape of guarantee `ScrollFilm` makes: the thing that can fail is additive, and its
+ * absence leaves a complete, ordinary page.
+ *
+ * When it DOES run, it is still never a trap: a visible Skip control is the first focusable
+ * element the script inserts, and scroll, click, or any key dismisses the whole sequence
+ * immediately. The homepage underneath has been sitting in the DOM, fully painted, the entire
+ * time — the overlay is a curtain in front of it, not a replacement for it.
+ *
+ * SCREEN ONE TYPES ITSELF IN, LETTER BY LETTER, ON COLOUR ALONE. The tagline's block appears
+ * almost immediately (its own quick fade/slide, as before) already fully in place — but every
+ * character starts at `--color-hairline-strong`, a pale warm grey close to the canvas, and each
+ * darkens to full ink on its own staggered delay. Nothing is ever invisible or reflows: the line
+ * is legible and stable from the first frame, and what moves is only how dark it is. That is the
+ * same principle `text-resolve` (global.css) uses for scroll-linked body copy, adapted to a fixed
+ * timeline here because the intro has no scroll to link to — the copy stays visible by default
+ * (the pale grey is still readable), and the darkening is purely an enhancement on top.
+ *
+ * THE TRANSITION TO SCREEN TWO IS TIMED OFF THE TYPING, NOT A DISCONNECTED GUESS. The hold before
+ * the tagline exits is computed from the actual character count and the per-letter stagger, so a
+ * shorter or longer line still finishes typing (plus a beat to register it) before the marquee is
+ * ever triggered — the number below is a formula, not a constant someone will forget to revisit
+ * if the tagline copy changes length.
+ */
+---
+
+<script>
+  const KEY = 'verity:intro-seen'
+
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const seen = sessionStorage.getItem(KEY) === '1'
+  const arrivedAtSection = location.hash.length > 1
+
+  if (reduced || seen || arrivedAtSection) {
+    // Nothing is built. The homepage, already in the DOM, is the whole page.
+  } else {
+    sessionStorage.setItem(KEY, '1')
+
+    // A short, real, LIVE claim per line — nothing here is a number that isn't a counted
+    // property of the code, and nothing here is a customer, a logo, or a certification. See
+    // docs/marketing/product-narrative.md Appendix A for where each one lives.
+    const ROW_A = [
+      'Reads every payment, every few minutes',
+      'Matches on proof, never on a guess',
+      'Never issues the same credit twice',
+      'Posts straight into your books',
+      'Isolated per tenant, enforced by the database',
+    ]
+    const ROW_B = [
+      'Zero humans in the loop on the clean cases',
+      'One matching floor. No exceptions to it.',
+      'Every action knows who — or what — did it',
+      'An exception queue short enough to actually work',
+      'Built to survive an auditor',
+    ]
+
+    document.body.style.overflow = 'hidden'
+
+    const overlay = document.createElement('div')
+    overlay.setAttribute('data-intro', '')
+    overlay.style.cssText =
+      'position:fixed;inset:0;z-index:100;background:var(--color-canvas);' +
+      'display:flex;flex-direction:column;align-items:center;justify-content:center;' +
+      'overflow:hidden;transition:transform .7s cubic-bezier(.6,0,.3,1),opacity .6s ease;'
+
+    const skip = document.createElement('button')
+    skip.textContent = 'Skip'
+    skip.setAttribute('aria-label', 'Skip intro')
+    skip.style.cssText =
+      'position:absolute;top:1.5rem;right:1.5rem;z-index:1;padding:.5rem 1rem;font:500 .8125rem/1 ' +
+      '"Geist Variable",sans-serif;color:var(--color-ink-muted);background:transparent;' +
+      'border:1px solid var(--color-hairline-strong);border-radius:5px;cursor:pointer;'
+
+    const TAGLINE_TEXT = 'The accounting work that does itself, and tells you what it did.'
+    const TYPE_STEP_MS = 32 // stagger between one letter starting to darken and the next
+    const TYPE_CHAR_MS = 420 // how long a single letter takes to go from pale to full ink
+
+    const tagline = document.createElement('p')
+    tagline.style.cssText =
+      'max-width:52rem;padding-inline:1.5rem;text-align:center;font:500 clamp(1.9rem,5vw,3.4rem)/1.15 ' +
+      '"Geist Variable",sans-serif;letter-spacing:-0.02em;opacity:0;' +
+      'transform:translateY(14px);transition:opacity .6s ease,transform .6s ease;'
+
+    // One span per CHARACTER, spaces included as ordinary space text nodes — never `&nbsp;`,
+    // which would turn every word boundary non-breaking and stop the line from wrapping at all.
+    // Each starts pale and carries its own transition-delay, so setting every span's colour to
+    // ink in the same tick (below) still darkens them in sequence rather than all at once.
+    const letters = [...TAGLINE_TEXT].map((ch, i) => {
+      const span = document.createElement('span')
+      span.textContent = ch
+      span.style.color = 'var(--color-ink-subtle)' // pale but legible (3.4:1) — hairline-strong is a border token, not text, and read as near-invisible against the canvas
+      // The delay is baked into the ONE shorthand string rather than set as a separate
+      // `transitionDelay` write. Both are valid CSS; the single string removes a shorthand/
+      // longhand write-order dependency that showed real, if rare, non-determinism under test —
+      // and it costs nothing to avoid, so it isn't worth trusting to browser engine minutiae.
+      span.style.transition = `color ${TYPE_CHAR_MS}ms ease ${i * TYPE_STEP_MS}ms`
+      tagline.appendChild(span)
+      return span
+    })
+
+    const marquee = document.createElement('div')
+    marquee.style.cssText =
+      'position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;' +
+      'opacity:0;transition:opacity .5s ease;'
+    marquee.innerHTML = [ROW_A, ROW_B]
+      .map((row, i) => {
+        const items = [...row, ...row]
+          .map(
+            (t, idx) =>
+              `<span style="margin-inline:2rem;font:${idx % row.length === 1 || idx % row.length === 3 ? '700' : '400'} clamp(1.3rem,3vw,2.1rem)/1 'Geist Variable',sans-serif;color:var(--color-ink);white-space:nowrap">${t}</span>`,
+          )
+          .join('')
+        const dir = i === 0 ? 'marquee-l' : 'marquee-r'
+        // 34s, not 22s — the user's word was the rows moved too fast to read comfortably.
+        return `<div style="display:flex;width:max-content;animation:${dir} 34s linear infinite;margin-block:.9rem">${items}${items}</div>`
+      })
+      .join('')
+
+    overlay.append(skip, tagline, marquee)
+    document.body.appendChild(overlay)
+
+    const style = document.createElement('style')
+    style.textContent = `
+      @keyframes marquee-l { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+      @keyframes marquee-r { from { transform: translateX(-50%) } to { transform: translateX(0) } }
+    `
+    document.head.appendChild(style)
+
+    let dismissed = false
+    const dismiss = () => {
+      if (dismissed) return
+      dismissed = true
+      overlay.style.transform = 'translateY(-100%)'
+      overlay.style.opacity = '0'
+      document.body.style.overflow = ''
+      window.removeEventListener('scroll', dismiss)
+      window.removeEventListener('keydown', dismiss)
+      setTimeout(() => overlay.remove(), 700)
+    }
+
+    skip.addEventListener('click', dismiss)
+    window.addEventListener('scroll', dismiss, { passive: true })
+    window.addEventListener('keydown', dismiss)
+
+    requestAnimationFrame(() => {
+      tagline.style.opacity = '1'
+      tagline.style.transform = 'none'
+    })
+
+    const TYPE_START_DELAY = 220 // lets the block's own fade/slide land before letters start
+    const HOLD_AFTER_TYPE = 600 // a beat with the full line dark, before screen one leaves
+    const CROSSFADE_GAP = 450 // tagline's own .6s fade-out, given time to mostly finish
+    const HOLD_MARQUEE = 6000 // was 2600 — screen two gets real time to be read, not glimpsed
+
+    // The typing duration is DERIVED from the letter count, not a constant — see the header
+    // comment. The last letter starts darkening at (n-1)*STEP and takes CHAR_MS to finish.
+    const typingDuration = (letters.length - 1) * TYPE_STEP_MS + TYPE_CHAR_MS
+    const screen1Duration = TYPE_START_DELAY + typingDuration + HOLD_AFTER_TYPE
+
+    setTimeout(() => {
+      for (const letter of letters) letter.style.color = 'var(--color-ink)'
+    }, TYPE_START_DELAY)
+
+    // Split into two timers rather than firing both in the same tick. Both elements are
+    // centered in the same space, so overlapping their transitions doesn't blend them — it
+    // visually collides two texts moving in different directions at once. Letting the tagline
+    // clear first, THEN bringing the marquee in, is what actually reads as a scene change.
+    setTimeout(() => {
+      tagline.style.opacity = '0'
+      tagline.style.transform = 'translateY(-14px)'
+    }, screen1Duration)
+
+    setTimeout(() => {
+      marquee.style.opacity = '1'
+    }, screen1Duration + CROSSFADE_GAP)
+
+    setTimeout(dismiss, screen1Duration + CROSSFADE_GAP + HOLD_MARQUEE)
+  }
+</script>

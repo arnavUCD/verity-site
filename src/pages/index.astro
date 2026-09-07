@@ -13,6 +13,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
 import { CONTACT_EMAIL } from '@/consts'
 import { url } from '@/lib/url'
 import ResolveText from '@/components/ResolveText.astro'
+import IntroOverlay from '@/components/IntroOverlay.astro'
 
 const pipeline = [
   {
@@ -58,6 +59,11 @@ const connectors = [
 ---
 
 <BaseLayout title="Your bank feed, reconciled and posted">
+  {/* The front door — added entirely by script, so its absence (no JS, reduced motion, a visitor
+      landing on a #section, a second visit this session) leaves exactly the page below, with
+      nothing missing and nothing to wait for. See the component for the full reasoning. */}
+  <IntroOverlay />
+
   {/* The hero is the film: a pinned, scroll-scrubbed pass through the whole pipeline, on the
       page's own light canvas throughout, so it hands off into the content below with no seam.
       It carries its own h1, subhead and CTAs. */}
