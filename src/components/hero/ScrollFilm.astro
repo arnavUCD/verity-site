@@ -37,15 +37,61 @@ import CtaButton from '@/components/CtaButton.astro'
  * statement line to posted credit.
  */
 const FEED = [
-  { desc: 'ACH CREDIT ACME ENTERPRISES INV1051', amt: '$12,000.00', tick: true },
   { desc: 'WIRE IN NORTHWIND TRADING INV-1042', amt: '$48,500.00', tick: true },
+  { desc: 'ACH CREDIT ACME ENTERPRISES INV1051', amt: '$12,000.00', tick: true },
   { desc: 'CHECK DEPOSIT 8842 NO MEMO', amt: '$9,150.00', tick: true },
-  { desc: 'ACH CREDIT SUMMIT LOGISTICS 1067', amt: '$3,275.00', tick: false },
-  { desc: 'WIRE FEDWIRE CEDAR & SONS INV1074', amt: '$6,400.00', tick: true },
-  { desc: 'ACH CREDIT ACME ENT INV1042 DUP?', amt: '$48,500.00', tick: false },
-  { desc: 'ZELLE PAYMENT 9920 NO REF', amt: '$2,100.00', tick: false },
-  { desc: 'ACH CREDIT VERTEX SUPPLY INV-1088', amt: '$18,900.00', tick: false },
-  { desc: 'WIRE IN ORION PARTS INV1043 SETTLE', amt: '$7,420.00', tick: false },
+  { desc: 'ACH CREDIT NORTHWIND INV1042 DUP?', amt: '$48,500.00', tick: false },
+]
+
+/**
+ * The institutions the feed arrives from, drawn as glass orbs that drift under it.
+ *
+ * THE PATH GEOMETRY IS THE BANKS' REAL MARKS, from Simple Icons (simpleicons.org), whose icon
+ * set is released CC0-1.0 — public domain, no attribution required for the path data itself.
+ * The TRADEMARKS remain the banks' own; they appear here to say what Verity connects to, which
+ * is the nominative use `/terms` already reserves ("product names of other companies belong to
+ * them, and are used here only to describe interoperability").
+ *
+ * VENDORED, NOT HOTLINKED. The paths are inlined below rather than fetched from a CDN at runtime,
+ * because `/security` and `/privacy` both claim this site makes no third-party request while you
+ * read it. A logo pulled from jsdelivr on page load would quietly make both pages false.
+ *
+ * Simple Icons normalises every mark to a 24x24 viewBox and a single monochrome path, which is
+ * why these can share one render path and take the orb's brand colour cleanly.
+ *
+ * Plaid is deliberately NOT an orb. The orbs are the institutions the money comes FROM; Plaid is
+ * the pipe it arrives through, and it is named in the heading instead. It also has no CC0 mark
+ * available, so an orb for it would have been the one drawn-by-hand shape in a field of real ones.
+ */
+const ORBS = [
+  {
+    id: 'chase',
+    label: 'Chase',
+    tint: '#117ACA',
+    x: 1040, y: 468, r: 50,
+    d: 'M0 15.415c0 .468.38.85.848.85h5.937V.575L0 7.72v7.695m15.416 8.582c.467 0 .846-.38.846-.849v-5.937H.573l7.146 6.785h7.697M24 8.587a.844.844 0 0 0-.847-.846h-5.938V23.43l6.782-7.148L24 8.586M8.585.003a.847.847 0 0 0-.847.847v5.94h15.688L16.282.003H8.585Z',
+  },
+  {
+    id: 'bankofamerica',
+    label: 'Bank of America',
+    tint: '#E31837',
+    x: 1188, y: 436, r: 44,
+    d: 'M15.194 7.57c.487-.163 1.047-.307 1.534-.451-1.408-.596-3.176-1.227-4.764-1.625-.253.073-1.01.271-1.534.434.541.162 2.328.577 4.764 1.642zm-8.896 6.785c.577.343 1.19.812 1.786 1.209 3.952-3.068 7.85-5.432 12.127-6.767-.596-.307-1.119-.578-1.787-.902-2.562.65-6.947 2.4-12.126 6.46zm-.758-6.46c-2.112.974-4.331 2.31-5.54 3.085.433.199.866.361 1.461.65 2.671-1.805 4.764-2.905 5.594-3.266-.595-.217-1.154-.361-1.515-.47zm8.066.234c-.686-.379-3.068-1.263-4.71-1.642-.487.18-1.173.451-1.642.65.595.162 2.815.758 4.71 1.714.487-.235 1.173-.523 1.642-.722zm-3.374 1.552c-.56-.27-1.173-.523-1.643-.74-1.425.704-3.284 1.769-5.63 3.447.505.27 1.047.595 1.624.92 1.805-1.335 3.627-2.598 5.649-3.627zm1.732 8.825c3.79-3.249 9.113-6.407 12.036-7.544a48.018 48.018 0 00-1.949-1.155c-3.771 1.246-8.174 4.007-12.108 7.129.667.505 1.371 1.028 2.02 1.57zm2.851-.235h-.108l-.18-.27h-.109v.27h-.072v-.596h.27c.055 0 .109 0 .145.036.054.019.072.073.072.127 0 .108-.09.162-.198.162zm-.289-.343c.09 0 .199.018.199-.09 0-.072-.072-.09-.144-.09h-.163v.18zm-.523.036c0-.289.235-.523.541-.523.307 0 .542.234.542.523a.543.543 0 01-.542.542.532.532 0 01-.54-.542m.107 0c0 .235.199.433.451.433a.424.424 0 100-.848c-.27 0-.45.199-.45.415',
+  },
+  {
+    id: 'wellsfargo',
+    label: 'Wells Fargo',
+    tint: '#D71E28',
+    x: 1322, y: 492, r: 47,
+    d: 'M12.136 13.949c0 .392-.245.616-.719.616h-.628v-1.226h.628c.48 0 .72.212.72.61zM6.922 15.06h1.044l-.523-1.443-.521 1.443zm12.46-1.82c-.72 0-1.109.562-1.109 1.526 0 .97.384 1.526 1.108 1.526.725 0 1.108-.556 1.108-1.526 0-.964-.389-1.526-1.108-1.526zM23.73 0v24H.269V0h23.462zm-5.548 10.652c.484.245.948.354 1.571.354.895 0 1.481-.458 1.481-1.171 0-.6-.357-1.014-1.028-1.172l-.677-.158c-.394-.092-.559-.25-.559-.517 0-.322.25-.523.74-.523s.778.18.89.604l.048.186h.383v-.943a2.927 2.927 0 0 0-1.352-.338c-.911 0-1.497.447-1.497 1.166 0 .556.34.965.996 1.112l.676.152c.432.099.592.273.592.562 0 .354-.261.55-.784.55-.59 0-.894-.24-1.027-.697l-.07-.235h-.383v1.068zm-3.378.245h3.02V9.595h-.383l-.043.19c-.106.486-.255.638-.607.638h-.74V7.557h.506v-.474h-1.753v.474h.453v2.866h-.453v.474zm-3.355 0h3.02V9.595h-.384l-.042.19c-.107.486-.256.638-.608.638h-.74V7.557h.506v-.474H11.45v.474h.452v2.866h-.452v.474zm-8.758-3.34.938 3.34h.74l.778-2.768.756 2.768h.74l.932-3.34h.736v2.866h-.453v.474h3.201V9.595h-.383l-.043.19c-.106.486-.26.638-.607.638h-.922V9.241h1.071a.58.58 0 0 0 .059-.273.55.55 0 0 0-.059-.26h-1.07v-1.15h.884c.357 0 .48.157.596.615l.038.147h.383V7.083H6.49v.474h.522l-.613 2.305-.762-2.779h-.766l-.746 2.774-.624-2.3h.501v-.474H2.266v.474h.426zm1.412 7.002v-1.22h.947c.358 0 .48.158.597.615l.038.147h.383v-1.236H2.857v.474h.453v2.866h-.453v.474h1.78v-.474h-.533v-1.112H5.2a.58.58 0 0 0 .058-.272.551.551 0 0 0-.058-.262H4.104zm9.114 1.913a.461.461 0 0 0-.048-.224.663.663 0 0 1-.112.011c-.245 0-.309-.142-.34-.458l-.022-.201c-.048-.43-.245-.708-.73-.746v-.017c.48-.022.975-.349.975-.964 0-.621-.496-1.008-1.257-1.008H9.542v.474h.453v2.866H9.26l-1.332-3.34H7.22l-1.305 3.34h-.373v.474h1.412v-.474h-.448l.245-.682h1.385l.245.682h-.437v.474h3.35v-.474h-.505v-1.16h.293c.586 0 .761.212.826.762l.02.19c.06.507.31.725.826.725.15 0 .299-.01.416-.027a.46.46 0 0 0 .048-.223zm3.633-1.788h-1.417a.52.52 0 0 0-.059.256c0 .11.016.18.059.268h.634v.964a1.598 1.598 0 0 1-.629.125c-.767 0-1.166-.56-1.166-1.53s.4-1.532 1.124-1.532c.485 0 .767.245.932.67l.058.153h.384v-.976a3.063 3.063 0 0 0-1.412-.337c-1.172 0-1.96.8-1.96 2.027 0 1.231.767 2.016 1.96 2.016.474 0 .964-.136 1.492-.404v-1.7zm4.512.082c0-1.182-.831-2.021-1.982-2.021-1.145 0-1.981.839-1.981 2.021 0 1.188.83 2.022 1.981 2.022 1.156 0 1.982-.834 1.982-2.022z',
+  },
+  {
+    id: 'americanexpress',
+    label: 'American Express',
+    tint: '#006FCF',
+    x: 1120, y: 532, r: 41,
+    d: 'M16.015 14.378c0-.32-.135-.496-.344-.622-.21-.12-.464-.135-.81-.135h-1.543v2.82h.675v-1.027h.72c.24 0 .39.024.478.125.12.13.104.38.104.55v.35h.66v-.555c-.002-.25-.017-.376-.108-.516-.06-.08-.18-.18-.33-.234l.02-.008c.18-.072.48-.297.48-.747zm-.87.407l-.028-.002c-.09.053-.195.058-.33.058h-.81v-.63h.824c.12 0 .24 0 .33.05.098.048.156.147.15.255 0 .12-.045.215-.134.27zM20.297 15.837H19v.6h1.304c.676 0 1.05-.278 1.05-.884 0-.28-.066-.448-.187-.582-.153-.133-.392-.193-.73-.207l-.376-.015c-.104 0-.18 0-.255-.03-.09-.03-.15-.105-.15-.21 0-.09.017-.166.09-.21.083-.046.177-.066.272-.06h1.23v-.602h-1.35c-.704 0-.958.437-.958.84 0 .9.776.855 1.407.87.104 0 .18.015.225.06.046.03.082.106.082.18 0 .077-.035.15-.08.18-.06.053-.15.07-.277.07zM0 0v10.096L.81 8.22h1.75l.225.464V8.22h2.043l.45 1.02.437-1.013h6.502c.295 0 .56.057.756.236v-.23h1.787v.23c.307-.17.686-.23 1.12-.23h2.606l.24.466v-.466h1.918l.254.465v-.466h1.858v3.948H20.87l-.36-.6v.585h-2.353l-.256-.63h-.583l-.27.614h-1.213c-.48 0-.84-.104-1.08-.24v.24h-2.89v-.884c0-.12-.03-.12-.105-.135h-.105v1.036H6.067v-.48l-.21.48H4.69l-.202-.48v.465H2.235l-.256-.624H1.4l-.256.624H0V24h23.786v-7.108c-.27.135-.613.18-.973.18H21.09v-.255c-.21.165-.57.255-.914.255H14.71v-.9c0-.12-.018-.12-.12-.12h-.075v1.022h-1.8v-1.066c-.298.136-.643.15-.928.136h-.214v.915h-2.18l-.54-.617-.57.6H4.742v-3.93h3.61l.518.602.554-.6h2.412c.28 0 .74.03.942.225v-.24h2.177c.202 0 .644.045.903.225v-.24h3.265v.24c.163-.164.508-.24.803-.24h1.89v.24c.194-.15.464-.24.84-.24h1.176V0H0zM21.156 14.955c.004.005.006.012.01.016.01.01.024.01.032.02l-.042-.035zM23.828 13.082h.065v.555h-.065zM23.865 15.03v-.005c-.03-.025-.046-.048-.075-.07-.15-.153-.39-.215-.764-.225l-.36-.012c-.12 0-.194-.007-.27-.03-.09-.03-.15-.105-.15-.21 0-.09.03-.16.09-.204.076-.045.15-.05.27-.05h1.223v-.588h-1.283c-.69 0-.96.437-.96.84 0 .9.78.855 1.41.87.104 0 .18.015.224.06.046.03.076.106.076.18 0 .07-.034.138-.09.18-.045.056-.136.07-.27.07h-1.288v.605h1.287c.42 0 .734-.118.9-.36h.03c.09-.134.135-.3.135-.523 0-.24-.045-.39-.135-.526zM18.597 14.208v-.583h-2.235V16.458h2.235v-.585h-1.57v-.57h1.533v-.584h-1.532v-.51M13.51 8.787h.685V11.6h-.684zM13.126 9.543l-.007.006c0-.314-.13-.5-.34-.624-.217-.125-.47-.135-.81-.135H10.43v2.82h.674v-1.034h.72c.24 0 .39.03.487.12.122.136.107.378.107.548v.354h.677v-.553c0-.25-.016-.375-.11-.516-.09-.107-.202-.19-.33-.237.172-.07.472-.3.472-.75zm-.855.396h-.015c-.09.054-.195.056-.33.056H11.1v-.623h.825c.12 0 .24.004.33.05.09.04.15.128.15.25s-.047.22-.134.266zM15.92 9.373h.632v-.6h-.644c-.464 0-.804.105-1.02.33-.286.3-.362.69-.362 1.11 0 .512.123.833.36 1.074.232.238.645.31.97.31h.78l.255-.627h1.39l.262.627h1.36v-2.11l1.272 2.11h.95l.002.002V8.786h-.684v1.963l-1.18-1.96h-1.02V11.4L18.11 8.744h-1.004l-.943 2.22h-.3c-.177 0-.362-.03-.468-.134-.125-.15-.186-.36-.186-.662 0-.285.08-.51.194-.63.133-.135.272-.165.516-.165zm1.668-.108l.464 1.118v.002h-.93l.466-1.12zM2.38 10.97l.254.628H4V9.393l.972 2.205h.584l.973-2.202.015 2.202h.69v-2.81H6.118l-.807 1.904-.876-1.905H3.343v2.663L2.205 8.787h-.997L.01 11.597h.72l.26-.626h1.39zm-.688-1.705l.46 1.118-.003.002h-.915l.457-1.12zM11.856 13.62H9.714l-.85.923-.825-.922H5.346v2.82H8l.855-.932.824.93h1.302v-.94h.838c.6 0 1.17-.164 1.17-.945l-.006-.003c0-.78-.598-.93-1.128-.93zM7.67 15.853l-.014-.002H6.02v-.557h1.47v-.574H6.02v-.51H7.7l.733.82-.764.824zm2.642.33l-1.03-1.147 1.03-1.108v2.253zm1.553-1.258h-.885v-.717h.885c.24 0 .42.098.42.344 0 .243-.15.372-.42.372zM9.967 9.373v-.586H7.73V11.6h2.237v-.58H8.4v-.564h1.527V9.88H8.4v-.507',
+  },
 ]
 
 /** Stations, in scene coordinates. The camera pans past them in order. */
@@ -117,8 +163,25 @@ const ROW_W = 320
           <stop offset="100%" stop-color="#fff" stop-opacity="0"></stop>
         </linearGradient>
         <mask id="feed-fade">
-          <rect x="920" y="120" width="560" height="480" fill="url(#feed-fade-g)"></rect>
+          <rect x="920" y="120" width="560" height="300" fill="url(#feed-fade-g)"></rect>
         </mask>
+
+        {/* Glass, built from gradients rather than `backdrop-filter`, which does not apply to SVG
+            shapes. Three layers make the read: a tinted body, a bright rim light along the upper
+            left, and a specular highlight offset from centre. */}
+        <radialGradient id="orb-sheen" cx="0.34" cy="0.28" r="0.72">
+          <stop offset="0%" stop-color="#fff" stop-opacity="0.95"></stop>
+          <stop offset="42%" stop-color="#fff" stop-opacity="0.28"></stop>
+          <stop offset="100%" stop-color="#fff" stop-opacity="0"></stop>
+        </radialGradient>
+        <linearGradient id="orb-rim" x1="0.2" y1="0" x2="0.8" y2="1">
+          <stop offset="0%" stop-color="#fff" stop-opacity="0.9"></stop>
+          <stop offset="45%" stop-color="#fff" stop-opacity="0.15"></stop>
+          <stop offset="100%" stop-color="#fff" stop-opacity="0.55"></stop>
+        </linearGradient>
+        <filter id="orb-shadow" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="6" stdDeviation="9" flood-color="#0b1a33" flood-opacity="0.18" />
+        </filter>
       </defs>
 
       <g data-camera>
@@ -128,10 +191,16 @@ const ROW_W = 320
             line up the way they do on a real statement. Masked at the foot so the feed dissolves
             rather than stopping at an edge — a feed continues past the frame; a list ends. */}
         <g data-act="feed" mask="url(#feed-fade)">
-          <text x="960" y="152" class="mono" font-size="14" letter-spacing="3" fill="var(--scene-dim)">
-            RAW BANK FEED
+          {/* Set in the TEXT face, not the machine one: this is the film speaking, not a value the
+              system produced. The live dot is the only thing that says "still arriving". */}
+          <text x="960" y="150" font-size="26" font-weight="500" letter-spacing="-0.4" fill="var(--scene-ink)">
+            Feed from your bank
           </text>
-          <circle cx="1124" cy="147" r="4" fill="var(--scene-accent)" opacity="0.85"></circle>
+          <circle cx="1258" cy="142" r="5" fill="var(--scene-ok)" data-live-dot></circle>
+          {/* Plaid named rather than orbed: it is the pipe, not an institution the money is at. */}
+          <text x="960" y="180" font-size="15" fill="var(--scene-dim)">
+            connected through Plaid
+          </text>
 
           {
             FEED.map((line, i) => {
@@ -163,6 +232,42 @@ const ROW_W = 320
                 </g>
               )
             })
+          }
+        </g>
+
+        {/* --------------------------------------------- the institutions it arrives from */}
+        {/* Outside the feed's mask on purpose: the mask exists to dissolve the narration lines at
+            their foot, and running it over the orbs would fade the bottom half of the field.
+
+            Positions here are the SERVER-RENDERED layout, and they are a complete, deliberate
+            arrangement on their own. The physics loop takes over on rAF and overwrites these
+            transforms; if it never runs (no JS, reduced motion, off-screen) this is what ships,
+            which is the same guarantee the rest of the film makes. */}
+        <g data-orbs>
+          {
+            ORBS.map((o) => (
+              <g data-orb={o.id} transform={`translate(${o.x} ${o.y})`}>
+                <g filter="url(#orb-shadow)">
+                  {/* An opaque base first. Glass over the page's own canvas needs something to
+                      refract, and a purely translucent disc just went muddy against it. */}
+                  <circle r={o.r} fill="var(--scene-surface)" />
+                  <circle r={o.r} fill={o.tint} fill-opacity="0.1" />
+                  <circle r={o.r} fill="url(#orb-sheen)" />
+                  <circle r={o.r} fill="none" stroke={o.tint} stroke-opacity="0.22" stroke-width="1" />
+                  <circle r={o.r} fill="none" stroke="url(#orb-rim)" stroke-width="1.8" />
+                </g>
+
+                {/* Simple Icons normalises every mark to a 24x24 box, so one transform serves
+                    all four: centre it, then scale to ~62% of the orb's diameter. */}
+                <g
+                  transform={`translate(${-o.r * 0.62} ${-o.r * 0.62}) scale(${(o.r * 1.24) / 24})`}
+                  fill={o.tint}
+                >
+                  <path d={o.d} />
+                </g>
+
+              </g>
+            ))
           }
         </g>
 
@@ -648,8 +753,141 @@ const ROW_W = 320
     }
   }
 
+  /**
+   * The orb field's physics: zero-gravity drift, walls, and elastic orb-on-orb collision.
+   *
+   * HAND-ROLLED RATHER THAN A LIBRARY, for one reason worth stating: the homepage already ships
+   * 113KB for GSAP, and matter.js would roughly double that to animate five circles. Circle
+   * physics is about forty lines. The dependency is not worth its weight here.
+   *
+   * It runs on its own rAF clock, deliberately NOT on the scroll timeline. The film is scrubbed —
+   * it only moves when the reader moves — and orbs that froze whenever the reader stopped
+   * scrolling would read as broken rather than as floating. Two independent systems writing two
+   * different transforms: GSAP owns the camera, this owns each orb.
+   */
+  /**
+   * Tuned against a headless run of this exact loop (90 simulated seconds per config), checking
+   * four things: no NaN, nothing escaping the box, no sustained overlap, and speeds that stay
+   * VARIED rather than collapsing to one value.
+   *
+   * The scene is 4200 units wide rendered at roughly 1440px, so one scene unit is about a third
+   * of a screen pixel. Speeds settle around 15-45 units/sec, which is 5-16 px/sec on screen: a
+   * drift you notice only if you look, which is the whole brief.
+   */
+  const WANDER = 4
+  const MAX_SPEED = 150
+
+  let orbFrame = 0
+  const startOrbs = () => {
+    if (orbFrame) return
+    const nodes = [...document.querySelectorAll<SVGGElement>('[data-orb]')]
+    if (!nodes.length) return
+
+    // Scene-coordinate bounds of act one's field, matching the server-rendered layout above and
+    // sitting clear of the narration lines, which end around y=340.
+    const BOX = { x0: 975, y0: 372, x1: 1455, y1: 604 }
+    const bodies = nodes.map((el) => {
+      const m = /translate\(([-\d.]+) ([-\d.]+)\)/.exec(el.getAttribute('transform') || '')
+      const r = Number(el.querySelector('circle')?.getAttribute('r') ?? 45)
+      return {
+        el,
+        x: m ? Number(m[1]) : 1200,
+        y: m ? Number(m[2]) : 400,
+        // Seeded per-orb so the field never starts in lockstep.
+        vx: (Math.random() - 0.5) * 130,
+        vy: (Math.random() - 0.5) * 130,
+        r,
+        m: r * r,
+      }
+    })
+
+    let last = performance.now()
+    const step = (now: number) => {
+      // Clamped, so a backgrounded tab returning after a minute does not integrate one huge
+      // timestep and fling every orb through a wall.
+      const dt = Math.min((now - last) / 1000, 0.05)
+      last = now
+
+      for (const b of bodies) {
+        // A small random nudge every frame. This is what makes the field read as FLOATING rather
+        // than as four balls on a billiard table: without it, drag bleeds the system down until
+        // every orb sits at exactly the same speed, which a headless run of this loop showed
+        // converging to a dead-uniform 8.0 units/sec within a minute. Four identical drifts look
+        // mechanical. The wander keeps their energies apart indefinitely.
+        b.vx += (Math.random() - 0.5) * WANDER
+        b.vy += (Math.random() - 0.5) * WANDER
+
+        b.x += b.vx * dt
+        b.y += b.vy * dt
+
+        // Walls. Reflect and damp slightly, then clamp so a body can never rest outside.
+        if (b.x - b.r < BOX.x0) { b.x = BOX.x0 + b.r; b.vx = Math.abs(b.vx) * 0.9 }
+        if (b.x + b.r > BOX.x1) { b.x = BOX.x1 - b.r; b.vx = -Math.abs(b.vx) * 0.9 }
+        if (b.y - b.r < BOX.y0) { b.y = BOX.y0 + b.r; b.vy = Math.abs(b.vy) * 0.9 }
+        if (b.y + b.r > BOX.y1) { b.y = BOX.y1 - b.r; b.vy = -Math.abs(b.vy) * 0.9 }
+      }
+
+      // Elastic collision, equal-mass form weighted by area. Only 5 bodies, so the naive O(n²)
+      // pass is cheaper than any structure that would avoid it.
+      for (let i = 0; i < bodies.length; i++) {
+        for (let j = i + 1; j < bodies.length; j++) {
+          const a = bodies[i]!, c = bodies[j]!
+          const dx = c.x - a.x, dy = c.y - a.y
+          const d = Math.hypot(dx, dy) || 0.0001
+          const overlap = a.r + c.r - d
+          if (overlap <= 0) continue
+
+          const nx = dx / d, ny = dy / d
+          // Positional correction first, split by mass, so they never sink into each other.
+          const total = a.m + c.m
+          a.x -= nx * overlap * (c.m / total); a.y -= ny * overlap * (c.m / total)
+          c.x += nx * overlap * (a.m / total); c.y += ny * overlap * (a.m / total)
+
+          const rel = (c.vx - a.vx) * nx + (c.vy - a.vy) * ny
+          if (rel > 0) continue // already separating
+          const imp = (-1.85 * rel) / (1 / a.m + 1 / c.m)
+          a.vx -= (imp * nx) / a.m; a.vy -= (imp * ny) / a.m
+          c.vx += (imp * nx) / c.m; c.vy += (imp * ny) / c.m
+        }
+      }
+
+      // Drag, plus a ceiling. There is deliberately NO speed floor: a hard floor is what produced
+      // the uniform-speed failure above. The wander force is the thing that keeps them alive.
+      for (const b of bodies) {
+        b.vx *= 0.999; b.vy *= 0.999
+        const sp = Math.hypot(b.vx, b.vy)
+        if (sp > MAX_SPEED) { const k = MAX_SPEED / sp; b.vx *= k; b.vy *= k }
+        b.el.setAttribute('transform', `translate(${b.x.toFixed(2)} ${b.y.toFixed(2)})`)
+      }
+
+      orbFrame = requestAnimationFrame(step)
+    }
+    orbFrame = requestAnimationFrame(step)
+  }
+
+  const stopOrbs = () => {
+    if (!orbFrame) return
+    cancelAnimationFrame(orbFrame)
+    orbFrame = 0
+  }
+
+  // Nothing to compute while the hero is off-screen or the tab is hidden (ADR 0012 §7.3).
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stopOrbs()
+    else if (wideEnough.matches && !reduced.matches) startOrbs()
+  })
+
   const evaluate = () => {
     if (!haveElements) return
+
+    // THE ORBS ARE GATED SEPARATELY FROM THE FILM, and the distinction is the point. The film
+    // needs width because it pins a stage and pans a scene three viewports wide; below 900px that
+    // cannot work, so it degrades to a static hero. Five circles drifting in a box have no such
+    // constraint. Starting them inside `startFilm` made them inherit a limit that was never about
+    // them, and act one lost its motion on exactly the screens with the least else going on.
+    if (reduced.matches || document.hidden) stopOrbs()
+    else startOrbs()
+
     if (wideEnough.matches && !reduced.matches) {
       startFilm()
     } else {
