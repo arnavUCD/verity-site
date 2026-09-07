@@ -15,8 +15,13 @@
  *   REDUCED MOTION → same: the script checks the media query BEFORE building anything, and exits.
  *   ARRIVING AT A `#section` ANCHOR → same: a visitor who followed a link to a specific part of
  *   the page came to see that part, not a tagline. The script checks `location.hash` first.
- *   A SECOND VISIT THIS SESSION → same, via `sessionStorage`. It plays once per tab per session,
- *   not on every back-navigation to `/`.
+ *   A SECOND VISIT THIS SESSION → same, via `sessionStorage` — WITH ONE EXCEPTION. This site has
+ *   no client-side routing, so every nav-link click is a real navigation already; the gate exists
+ *   only to stop the intro replaying on an ordinary return to `/` (the logo, back/forward). An
+ *   explicit RELOAD of `/` is a different act — the visitor (or, this whole session, the person
+ *   building the thing) asked to see the page again from the top — so it is exempted via the
+ *   Navigation Timing API's `type`, which distinguishes 'reload' from 'navigate' and
+ *   'back_forward' without needing to intercept anything.
  *
  * In every one of those cases the fallback is not a degraded overlay — it is NO OVERLAY, which is
  * the same shape of guarantee `ScrollFilm` makes: the thing that can fail is additive, and its
@@ -48,7 +53,11 @@
   const KEY = 'verity:intro-seen'
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  const seen = sessionStorage.getItem(KEY) === '1'
+  // Unsupported → `isReload` stays false, which is the safe direction: worst case is the
+  // pre-existing once-per-session behaviour, never an unwanted replay.
+  const navEntry = performance.getEntriesByType('navigation')[0]
+  const isReload = navEntry instanceof PerformanceNavigationTiming && navEntry.type === 'reload'
+  const seen = sessionStorage.getItem(KEY) === '1' && !isReload
   const arrivedAtSection = location.hash.length > 1
 
   if (reduced || seen || arrivedAtSection) {
