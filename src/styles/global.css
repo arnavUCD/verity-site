@@ -55,10 +55,17 @@
      just what the mark is made of. `--brand-mid` is also the site's one DECORATIVE blue — it may
      fill a gradient or draw a rule, and it is never a link colour; `--accent` stays that.
 
-     KNOWN DESYNC: `Wordmark.astro` says "change one, change the other" about the app's
-     `frontend/src/app/Wordmark.tsx`, which still draws the violet. Corrected here only, on the
-     user's direction — the app follows in its own change. */
-  --color-brand: #0e2668; /* 13.1:1 on canvas */
+     HOW THE VALUE IS DERIVED, so the two copies can never drift apart again: `--color-brand` is
+     the MEAN of every pixel in the artwork below a luminance of 60 — all 345,226 of them, the
+     wordmark's strokes and the dome's core together. A mean rather than an eyedropper reading,
+     because the poster is a photograph with a vignette and a gradient, so any single pixel is an
+     arbitrary choice: this file said #0e2668 and the app said #172969, and both were "sampled
+     from the poster". Re-measuring the same way gives the same number.
+
+     The app's `frontend/src/index.css` carries these same two values. Change one, change the
+     other. (The desync that used to be recorded here is resolved: the app drew violet #2b2478
+     until the "Clarity" redesign — ADR 0020.) */
+  --color-brand: #142a6a; /* 12.8:1 on canvas */
   --color-brand-mid: #2f5082; /* 7.8:1 — passes for text, but reserved for decoration */
   --color-accent-wash: #eaf3ff; /* pale tint — selection highlight, chip fills (accent text sits on this) */
   --color-accent-bright: #78bbff; /* borders, dividers, decorative fills — no text ever sits on this alone */
