@@ -4,9 +4,9 @@ import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'astro/config'
 import { SITE_URL } from './src/consts'
 
-// ADR 0011 §1 — a pre-rendered static site. No adapter, no SSR, no server tier: the deployed
+// A pre-rendered static site. No adapter, no SSR, no server tier: the deployed
 // artifact is HTML/CSS/fonts, served by nginx on its own vhost, proxying nothing (§2, §3).
-// No React: the hero film is SVG + a GSAP timeline (ADR 0012 §10), and nothing else on the site
+// No React: the hero film is SVG + a GSAP timeline, and nothing else on the site
 // needs a component runtime. A marketing page that requires JS to render its own text has lost.
 /**
  * `site` and `base` are read from the environment so the deploy workflow can derive them from the
