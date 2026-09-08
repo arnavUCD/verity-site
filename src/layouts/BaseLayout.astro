@@ -4,7 +4,7 @@
  * one place — a marketing site that gets its canonical or its OG tags subtly wrong on one page
  * has no way of noticing.
  *
- * Zero client JS by default (ADR 0011 §1): nothing in this shell hydrates. Islands are opted
+ * Zero client JS by default: nothing in this shell hydrates. Islands are opted
  * into per component, never inherited from the layout.
  */
 import SiteFooter from '@/components/SiteFooter.astro'
@@ -43,7 +43,7 @@ const fullTitle = `${title} · ${SITE_NAME}`
     <meta property="og:url" content={canonical} />
     <meta name="twitter:card" content="summary_large_image" />
 
-    {/* One light theme by design (ADR 0012 §1) — light reads as *audited*, which is the right
+    {/* One light theme by design — light reads as *audited*, which is the right
         association for a product that posts entries to real books. Declared so form controls,
         scrollbars and the address bar match instead of flashing a dark UA default. */}
     <meta name="color-scheme" content="light" />

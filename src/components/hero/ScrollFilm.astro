@@ -12,7 +12,7 @@
  * 1. THE TALL SCROLL HEIGHT IS SET BY JS, NEVER BY CSS. Without the script the section is exactly
  *    one viewport tall and shows act one — a complete, readable hero. Had the 460vh lived in the
  *    stylesheet, a failed script would leave four blank screens to scroll past, which is the
- *    ADR 0012 §5 failure in its most expensive form.
+ *    the no-gating failure in its most expensive form.
  * 2. COLOUR IS SIX CSS VARIABLES, READ FROM THE STYLESHEET, NEVER TWEENED. Every mark and every
  *    word of copy reads them from `[data-stage]` (global.css) — the same values whether the film
  *    is running, static, or not yet hydrated — so there is nothing for JS to get right or wrong
@@ -233,7 +233,7 @@ const ROW_W = 320
                     {line.desc}
                   </text>
                   {/* Amount and narration are both machine artefacts, so both are mono — which is
-                      Source Code Pro now (ADR 0012 §13). The `figure` role that briefly set these
+                      Source Code Pro now. The `figure` role that briefly set these
                       in the text face is gone with it. */}
                   <text
                     x="1404"
@@ -889,7 +889,7 @@ const ROW_W = 320
     orbFrame = 0
   }
 
-  // Nothing to compute while the hero is off-screen or the tab is hidden (ADR 0012 §7.3).
+  // Nothing to compute while the hero is off-screen or the tab is hidden.
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) stopOrbs()
     else if (wideEnough.matches && !reduced.matches) startOrbs()

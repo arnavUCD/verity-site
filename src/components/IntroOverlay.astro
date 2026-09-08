@@ -1,12 +1,12 @@
 ---
 /**
  * The front door: a tagline, then a fast marquee of real capabilities, then it lifts to reveal
- * the homepage — which is already fully rendered underneath it. On the user's direction, after
+ * the homepage — which is already fully rendered underneath it. after
  * looking at a reference (opraah.in): that site turned out to have no gate at all, just two
  * sections of one long scroll. This is the real thing: a sequence that has to resolve before the
  * ordinary page is what the visitor is looking at.
  *
- * THAT IS EXACTLY WHAT ADR 0012 §5 FORBIDS BY DEFAULT — "no animation may gate content" — so
+ * THAT IS EXACTLY WHAT THE NO-GATING RULE FORBIDS BY DEFAULT ("no animation may gate content"), so
  * everything below exists to satisfy the letter of that rule while still building the gate the
  * user asked for. THE RESOLUTION: the gate is added ENTIRELY BY SCRIPT, never present without it.
  *
@@ -140,7 +140,7 @@
           )
           .join('')
         const dir = i === 0 ? 'marquee-l' : 'marquee-r'
-        // 34s, not 22s — the user's word was the rows moved too fast to read comfortably.
+        // 34s, not 22s — we's word was the rows moved too fast to read comfortably.
         return `<div style="display:flex;width:max-content;animation:${dir} 34s linear infinite;margin-block:.9rem">${items}${items}</div>`
       })
       .join('')

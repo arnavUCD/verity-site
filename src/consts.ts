@@ -1,6 +1,6 @@
 /**
  * Site-wide constants. Everything a domain change touches lives here, so wiring the real
- * domain later is a one-file edit (ADR 0011 §2).
+ * domain later is a one-file edit.
  */
 
 export const SITE_NAME = 'Verity'
@@ -30,10 +30,10 @@ export const NOINDEX = true
 export const SITE_URL = 'https://verity.example.com'
 
 /**
- * The operator UI, on its own origin (ADR 0011 §2). This is where the primary CTA goes: the
+ * The operator UI, on its own origin. This is where the primary CTA goes: the
  * demo IS the product, so "see the live demo" lands in the real app rather than a booking form.
  *
- * KNOWN GAP (ADR 0011 §7): the app still greets visitors as "EOS". Renaming it is its own change.
+ * KNOWN GAP: the app still greets visitors as "EOS". Renaming it is its own change.
  */
 export const APP_URL = 'https://frontend-production-2175.up.railway.app'
 

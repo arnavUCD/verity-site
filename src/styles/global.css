@@ -1,19 +1,19 @@
 @import 'tailwindcss';
 
 /* Self-hosted, so the site makes no third-party font request — one fewer origin in the privacy
-   story /security has to tell. Two faces, one job each (ADR 0012 §3): Geist carries ALL prose,
+   story /security has to tell. Two faces, one job each: Geist carries ALL prose,
    headings and labels; Source Code Pro carries every MACHINE ARTEFACT — invoice refs, amounts,
    narration, state names. That assignment is semantic, not stylistic: the mono face means "this
    is a literal value the system handled", which is the exact distinction the product sells.
 
-   SOURCE CODE PRO REPLACES IBM PLEX MONO (ADR 0012 §13), on the user's direction. One mono face
+   SOURCE CODE PRO REPLACES IBM PLEX MONO. One mono face
    now covers both machine artefacts and figures, which is why the separate `figure` role added
    for the film's amounts is gone again — it existed only to hold a second numeric face. */
 @import '@fontsource-variable/geist';
 @import '@fontsource-variable/source-code-pro';
 
 /* ============================================================================
-   Verity marketing — the "Instrument" design system (ADR 0012).
+   Verity marketing — the "Instrument" design system.
 
    The product's claim is that it acts on PROOF rather than on a good guess. The
    page should argue that before a word is read: light, measured, hairline-ruled,
@@ -27,7 +27,7 @@
    2. --confirmed AND --exception ARE STATE VOCABULARY, NOT DECORATION. They mean
       what the product means by them — evidence cleared the floor, or it did not.
       Never a chart colour, never a pleasing accent.
-   3. NO ANIMATION MAY GATE CONTENT (ADR 0012 §5). Nothing is `opacity: 0` in the
+   3. NO ANIMATION MAY GATE CONTENT. Nothing is `opacity: 0` in the
       base stylesheet waiting for JS to rescue it. Reveals below are built on
       native scroll-driven animation, which degrades to "already visible" wherever
       it is unsupported — the failure mode is no animation, never no content.
@@ -64,7 +64,7 @@
 
      The app's `frontend/src/index.css` carries these same two values. Change one, change the
      other. (The desync that used to be recorded here is resolved: the app drew violet #2b2478
-     until the "Clarity" redesign — ADR 0020.) */
+     until the "Clarity" redesign.) */
   --color-brand: #142a6a; /* 12.8:1 on canvas */
   --color-brand-mid: #2f5082; /* 7.8:1 — passes for text, but reserved for decoration */
   --color-accent-wash: #eaf3ff; /* pale tint — selection highlight, chip fills (accent text sits on this) */
@@ -88,7 +88,7 @@
 
 @layer base {
   html {
-    /* Lenis owns smooth scrolling where it runs (ADR 0012 §4); CSS smooth scroll here would
+    /* Lenis owns smooth scrolling where it runs; CSS smooth scroll here would
        fight it. Anchor offset still has to clear the sticky header. */
     scroll-behavior: auto;
   }
@@ -125,7 +125,7 @@
 }
 
 /* ============================================================================
-   The hero film's palette (ADR 0012 §10).
+   The hero film's palette.
 
    Six variables that every mark in the scene and every word of hero copy reads. The film stays on
    ONE light palette throughout the whole scroll — no dark act, no resolve — so these are also the
@@ -189,7 +189,7 @@
    Type roles
    ============================================================================ */
 
-/* Every machine artefact: refs, amounts, narration, state names. See ADR 0012 §3. */
+/* Every machine artefact: refs, amounts, narration, state names. */
 @utility mono {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
@@ -199,7 +199,7 @@
 /* The small label above a heading. Used sparingly: it is the schematic's callout, and it stops
    working the moment it is everywhere.
 
-   IT IS NO LONGER MONO (ADR 0012 §13). Setting editorial eyebrows in the machine face was the one
+   IT IS NO LONGER MONO. Setting editorial eyebrows in the machine face was the one
    place §3's semantic rule leaked: a section heading like "The pipeline" is the site TALKING, not
    a literal value the system produced, so the mono face was claiming something untrue about it.
    Moving labels to Geist narrows mono to exactly what §3 says it means, and the rule reads more
@@ -253,7 +253,7 @@
    Motion.
 
    Built on NATIVE scroll-driven animation (`animation-timeline: view()`), which
-   is why it satisfies ADR 0012 §5 for free: where the feature is unsupported the
+   is why it satisfies the no-gating rule for free: where the feature is unsupported the
    declaration is simply ignored and the element renders in its final state. The
    element is never hidden waiting to be rescued — there is no JS in this path at
    all, so there is no tab-throttling, hydration-failure, or observer-never-fired
@@ -265,7 +265,7 @@
    element, `cover 22%` resolves EARLIER than `entry 5%`, giving an inverted range whose progress
    pins at 0 — so the element holds its `from` keyframe forever and the content is invisible while
    sitting in the middle of the viewport. Caught in browser: six pipeline steps, fully on screen,
-   `opacity: 0`. Exactly the failure ADR 0012 §5 exists to forbid, produced by the utility written
+   `opacity: 0`. Exactly the failure the no-gating rule exists to forbid, produced by the utility written
    to honour it. A single-phase range is well-formed in every geometry, including elements taller
    than the viewport and elements already on screen at load. */
 @utility reveal {
@@ -335,7 +335,7 @@
    accent blue silently rendered near-black inherited ink, and only when the animation happened
    to be mid-range did they look right.
 
-   That is ADR 0012 §5's implementation rule ("content is visible by default, animation is an
+   That is the no-gating rule ("content is visible by default, animation is an
    enhancement on top") failing in its quieter form: not invisible content, but a FINAL STATE that
    only exists while an animation is running. The base declaration and the `to` keyframe are the
    same value on purpose — every path now ends accent blue, animated or not. */
@@ -371,7 +371,7 @@
   animation-range: entry 0% entry 45%;
 }
 
-/* Card hover. Depth still comes from the hairline and from alignment (ADR 0012 §2) — the lift is
+/* Card hover. Depth still comes from the hairline and from alignment — the lift is
    two pixels, a border that warms to the brand blue, and the faintest brand tint. NOT a shadow:
    a shadow here would say "soft", and the whole argument is precision. */
 @utility lift {
@@ -497,7 +497,7 @@
   );
 }
 
-/* Every animation on this site is decorative by decision (ADR 0012 §5), so turning
+/* Every animation on this site is decorative by decision, so turning
    all of it off can never cost a visitor content. */
 @media (prefers-reduced-motion: reduce) {
   *,
