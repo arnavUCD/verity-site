@@ -1,7 +1,7 @@
 /**
  * Base-aware internal links.
  *
- * On GitHub Pages a project site is served from a SUBPATH (`/verity-site/`), not the domain root.
+ * On GitHub Pages a project site is served from a SUBPATH (`/credere-site/`), not the domain root.
  * Astro rewrites asset URLs for that automatically; it does **not** rewrite `href` attributes you
  * wrote by hand. A bare `href="/security"` therefore resolves to `username.github.io/security` —
  * off the site entirely, and a 404 on every nav click. Every internal link goes through here.

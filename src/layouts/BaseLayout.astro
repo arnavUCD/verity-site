@@ -50,11 +50,9 @@ const fullTitle = `${title} · ${SITE_NAME}`
     <meta name="theme-color" content="#fafaf9" />
 
     {/* THE ?v= IS LOAD-BEARING, not decoration. A browser's favicon store is separate from its
-        HTTP cache: it ignores `cache-control` (GitHub serves this one at max-age=600) and keys
-        icons by URL, effectively forever. The mark here changed twice — placeholder equals sign,
-        then the dome — and tabs opened before those changes kept showing the old glyph with no
-        amount of reloading, because the URL never moved. Bump this whenever the icon changes. */}
-    <link rel="icon" href={url(`/favicon.svg?v=${ICON_VERSION}`)} type="image/svg+xml" />
+        HTTP cache and often keeps an icon after the file changes. Bump this whenever the icon
+        changes so visitors receive the current Credere mark. */}
+    <link rel="icon" href={url(`/favicon.png?v=${ICON_VERSION}`)} type="image/png" />
     <link rel="sitemap" href={url("/sitemap-index.xml")} />
   </head>
 

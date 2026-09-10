@@ -13,7 +13,7 @@
 @import '@fontsource-variable/source-code-pro';
 
 /* ============================================================================
-   Verity marketing — the "Instrument" design system.
+   Credere marketing — the "Instrument" design system.
 
    The product's claim is that it acts on PROOF rather than on a good guess. The
    page should argue that before a word is read: light, measured, hairline-ruled,
@@ -44,27 +44,10 @@
 
   --color-accent: #175ba6; /* 6.5:1 on canvas — navy blue, text/buttons/links/focus */
 
-  /* The BRAND MARK's colours, and only those. MEASURED off the poster (`Verity Logo.png`), not
-     approximated — which is the correction they carry. The token these replace, `--indigo:
-     #2b2478`, claimed in its own comment to have been sampled from that poster and had not been:
-     #2b2478 is violet (R>G), and every navy in the poster is blue (G>R). The mark had been
-     quietly off-brand since it was drawn.
-       --brand      the drawn wordmark's ink, and the dome's deep core
-       --brand-mid  the dome's lit rim — the poster's dome is a GRADIENT, not a flat fill
-     Deliberately NOT state vocabulary (rule 2 in the banner): they never mean anything, they are
-     just what the mark is made of. `--brand-mid` is also the site's one DECORATIVE blue — it may
-     fill a gradient or draw a rule, and it is never a link colour; `--accent` stays that.
-
-     HOW THE VALUE IS DERIVED, so the two copies can never drift apart again: `--color-brand` is
-     the MEAN of every pixel in the artwork below a luminance of 60 — all 345,226 of them, the
-     wordmark's strokes and the dome's core together. A mean rather than an eyedropper reading,
-     because the poster is a photograph with a vignette and a gradient, so any single pixel is an
-     arbitrary choice: this file said #0e2668 and the app said #172969, and both were "sampled
-     from the poster". Re-measuring the same way gives the same number.
-
-     The app's `frontend/src/index.css` carries these same two values. Change one, change the
-     other. (The desync that used to be recorded here is resolved: the app drew violet #2b2478
-     until the "Clarity" redesign.) */
+  /* Brand blues used by the surrounding interface. The supplied Credere wordmark is rendered as
+     artwork rather than reconstructed from these tokens. Success stays green, risk stays ochre,
+     and neither gets borrowed for decoration. `--brand-mid` may warm a rule or ambient wash;
+     `--accent` remains the darker interactive/action colour. */
   --color-brand: #142a6a; /* 12.8:1 on canvas */
   --color-brand-mid: #2f5082; /* 7.8:1 — passes for text, but reserved for decoration */
   --color-accent-wash: #eaf3ff; /* pale tint — selection highlight, chip fills (accent text sits on this) */

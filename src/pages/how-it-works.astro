@@ -16,7 +16,7 @@ const steps = [
     n: '01',
     name: 'Ingest',
     line: 'Read once, never twice',
-    body: 'Verity reads your bank feed every few minutes and resumes from a saved cursor instead of re-sweeping history. A retried poll, a network blip, or a restart mid-batch produces no duplicate rows.',
+    body: 'Credere reads your bank feed every few minutes and resumes from a saved cursor instead of re-sweeping history. A retried poll, a network blip, or a restart mid-batch produces no duplicate rows.',
     detail:
       'This is the least glamorous step and the one most in-house builds get wrong. Reading each transaction exactly once is what makes every decision after it safe to repeat.',
   },
@@ -26,13 +26,13 @@ const steps = [
     line: 'Matched only on proof',
     body: 'Every transaction is matched to the invoice it belongs to, on confirmed evidence or not at all. Clearing the floor takes a reference the payment itself carries, checked against that invoice in your billing system. Nothing else counts.',
     detail:
-      'Zero candidates is an exception. More than one is an exception. So is an unresolved sibling payment against the same invoice in the same batch. Verity does not break ties.',
+      'Zero candidates is an exception. More than one is an exception. So is an unresolved sibling payment against the same invoice in the same batch. Credere does not break ties.',
   },
   {
     n: '03',
     name: 'Classify',
     line: 'Duplicate, overpayment, or clean',
-    body: 'Matched transactions resolve to one of four types. Duplicate detection reads what Verity has confirmed itself. It never reads your billing system’s “paid” flag, which can be set for a dozen reasons Verity cannot see.',
+    body: 'Matched transactions resolve to one of four types. Duplicate detection reads what Credere has confirmed itself. It never reads your billing system’s “paid” flag, which can be set for a dozen reasons Credere cannot see.',
     detail:
       'Reasoning about money from a flag you did not write and cannot explain is how wrong credits get issued. We read what we can prove.',
   },
@@ -56,7 +56,7 @@ const steps = [
     n: '06',
     name: 'Report',
     line: 'Posted back to your books',
-    body: 'At the end of the day you get two lists. Everything Verity settled, each with the basis for its decision. And the short list whose evidence did not settle.',
+    body: 'At the end of the day you get two lists. Everything Credere settled, each with the basis for its decision. And the short list whose evidence did not settle.',
     detail:
       'The two cannot overlap. An item is either resolved or waiting for you. It is never presented as both.',
   },
@@ -72,12 +72,12 @@ const types = [
 
 <BaseLayout
   title="How it works"
-  description="Verity polls your bank feed, matches each payment to an invoice on confirmed evidence, classifies it, credits what is owed, and posts it back to your billing system. Anything ambiguous becomes an exception with the reasoning attached."
+  description="Credere polls your bank feed, matches each payment to an invoice on confirmed evidence, classifies it, credits what is owed, and posts it back to your billing system. Anything ambiguous becomes an exception with the reasoning attached."
 >
   <PageHero
     eyebrow="How it works"
     title="What happens between a payment landing and your books being right."
-    lede="Verity sits between two systems you already have: your bank, and your billing system. Between them it runs the loop a person runs today. Six steps, and five of them need nobody."
+    lede="Credere sits between two systems you already have: your bank, and your billing system. Between them it runs the loop a person runs today. Six steps, and five of them need nobody."
   />
 
   {/* --------------------------------------------------------------- the two doors */}
@@ -88,7 +88,7 @@ const types = [
           <span class="chip chip-confirmed">primary</span>
           <h2 class="mt-5 text-2xl font-medium">The bank feed finds the work</h2>
           <p class="text-ink-muted mt-4 leading-relaxed">
-            Nobody types anything. Payments arrive, Verity works out what each one was, and the ones
+            Nobody types anything. Payments arrive, Credere works out what each one was, and the ones
             it can prove are handled end to end, including the write-back. This is the engine. It
             runs whether or not anyone signs in.
           </p>
@@ -212,7 +212,7 @@ const types = [
           </h2>
           <div class="text-ink-muted mt-7 space-y-5 text-lg leading-relaxed">
             <p>
-              Because every action is stamped at write time with what kind of actor took it, Verity
+              Because every action is stamped at write time with what kind of actor took it, Credere
               can answer a question most finance tools cannot: what fraction of your money decisions
               had no human in the loop.
             </p>
@@ -222,7 +222,7 @@ const types = [
               recorded fact you can hand over.
             </p>
             <p>
-              Verity also watches for the failure nobody notices: a feed that is configured but not
+              Credere also watches for the failure nobody notices: a feed that is configured but not
               being processed. An empty queue looks like a quiet week right up until close.
             </p>
           </div>
@@ -234,7 +234,7 @@ const types = [
             Removing the approval step for bank-matched payments
           </h3>
           <p class="text-ink-muted mt-4 leading-relaxed">
-            Where attribution is confirmed, Verity will classify, credit and post with no human gate
+            Where attribution is confirmed, Credere will classify, credit and post with no human gate
             before the write. The finance head keeps the end-of-day report and the exception queue.
           </p>
           <p class="text-ink-muted mt-4 text-sm leading-relaxed">

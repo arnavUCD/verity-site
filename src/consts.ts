@@ -3,17 +3,16 @@
  * domain later is a one-file edit.
  */
 
-export const SITE_NAME = 'Verity'
+export const SITE_NAME = 'Credere'
 
 /**
- * Cache-buster for the favicon, appended as `?v=`. BUMP THIS ANY TIME public/favicon.svg CHANGES.
+ * Cache-buster for the favicon, appended as `?v=`. BUMP THIS ANY TIME public/favicon.png CHANGES.
  *
  * A browser's favicon store is not its HTTP cache. It ignores `cache-control` and keys icons by
  * URL more or less permanently, so replacing the file alone does not reach anyone whose tab
- * already has the old one. That is not hypothetical here: the mark went from a placeholder equals
- * sign to the dome, and tabs opened before the change kept the equals sign through every deploy.
+ * already has the old one.
  */
-export const ICON_VERSION = 4
+export const ICON_VERSION = 5
 
 /**
  * Keeps the whole site out of search while it lives on a temporary GitHub Pages URL. Set to false
@@ -27,7 +26,7 @@ export const ICON_VERSION = 4
 export const NOINDEX = true
 
 /** TODO(domain): placeholder until the real domain is registered. Used for canonical URLs and the sitemap. */
-export const SITE_URL = 'https://verity.example.com'
+export const SITE_URL = 'https://credere.example.com'
 
 /**
  * The operator UI, on its own origin. This is where the primary CTA goes: the
@@ -48,10 +47,10 @@ export const APP_URL = 'https://frontend-production-2175.up.railway.app'
 export const APP_ENTRY_URL = `${APP_URL}/welcome`
 
 /** TODO(contact): a real inbox, not a personal address. The site has no form — this is the only route in. */
-export const CONTACT_EMAIL = 'hello@verity.example.com'
+export const CONTACT_EMAIL = 'hello@credere.example.com'
 
 export const SITE_DESCRIPTION =
-  'Verity is an agentic accounting operations layer. It connects your bank and your billing ' +
+  'Credere is an agentic accounting operations layer. It connects your bank and your billing ' +
   'system, works out what each payment was, credits what is owed, and posts it back on its own. ' +
   'You read the end-of-day report.'
 
@@ -97,7 +96,7 @@ export const NAV: NavItem[] = [
     href: '/use-cases',
     label: 'Use cases',
     sections: [
-      { href: '/use-cases#cases', label: 'Eight situations', desc: 'An ordinary finance week, with and without Verity' },
+      { href: '/use-cases#cases', label: 'Eight situations', desc: 'An ordinary finance week, with and without Credere' },
       { href: '/use-cases#uc-1', label: 'Duplicate payments', desc: 'The second payment nobody catches for a quarter' },
       { href: '/use-cases#uc-3', label: 'Ambiguous references', desc: 'Two plausible invoices, one payment, no guess' },
       { href: '/use-cases#business-case', label: 'The business case', desc: 'Four numbers we would rather you calculated' },

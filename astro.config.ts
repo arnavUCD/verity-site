@@ -13,7 +13,7 @@ import { SITE_URL } from './src/consts'
  * repository itself (see .github/workflows/deploy.yml) — nothing about the hosting is hardcoded
  * here, and moving to a custom domain means changing the workflow, not the source.
  *
- * `base` is the GitHub Pages project subpath (`/verity-site`). Astro rewrites asset URLs for it;
+ * `base` is the GitHub Pages project subpath (`/credere-site`). Astro rewrites asset URLs for it;
  * hand-written `href`s go through `src/lib/url.ts`.
  */
 export default defineConfig({

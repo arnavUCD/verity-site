@@ -1,6 +1,6 @@
-# Verity marketing site
+# Credere marketing site
 
-The public site for Verity, an accounting operations tool that reads a bank feed, matches each
+The public site for Credere, an accounting operations tool that reads a bank feed, matches each
 payment to an invoice, and posts the correction back to the billing system.
 
 Built with Astro and Tailwind v4. Static output, no server, no forms, no analytics, no cookies.
